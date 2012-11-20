@@ -1,0 +1,58 @@
+                               +--------------+
+----------------------------- { Script And Files }  ---------------------------------
+                               +--------------+
+
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomation/logs//Assert_18_Nov_2012_20_19_18/Assert_18_Nov_2012_20_19_18.log
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Assert.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Assert.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Assert.tpl
+                             +----------------------+
+----------------------------- { Script Exec Params }  -------------------------
+                             +----------------------+
+
+	
+	'testcases': '[1]'
+	
+
+                             +-----------------+
+----------------------------- { Components Used }  ---------------------------------
+                             +-----------------+
+
+
+                             +--------------+
+----------------------------- { Topology }  ---------------------------------
+                             +--------------+
+
+	
+	
+	
+------------------------------------------------------------------------------------------------------------------
+
+************************************
+ CASE INIT 
+*************************************
+
+*****************************
+ Result summary for Testcase1
+*****************************
+
+**********************************
+ Result: Pass 
+***********************************
+
+
+ ******************************
+	Test Execution Summary
+
+ ******************************
+
+ Test Start           : 18 Nov 2012 20:19:18
+ Test End             : 18 Nov 2012 20:19:18
+ Execution Time       : 0:00:00.005522
+ Total tests planned  : 1
+ Total tests RUN      : 1
+ Total Pass           : 1
+ Total Fail           : 0
+ Total No Result      : 0
+ Success Percentage   : 100%
+ Execution Result     : 100%

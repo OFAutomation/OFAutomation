@@ -1,0 +1,23 @@
+[TOPOLOGY]    
+
+    [[COMPONENT]]
+        [[["Mininet1"]]]
+            'host' = '192.168.56.101'
+            'user' = 'openflow'
+            'password' = 'openflow'
+            'type' = "Mininet"
+            [[[["OPTIONS"]]]]
+                # Specify the Option for mininet
+                'topo' = 'single'
+                'topocount' = '3'
+                'switch' = 'ovsk'
+                'controller' = 'remote'
+        [[["POX2"]]]
+            'host' = '192.168.56.101'
+            'user' = 'openflow'
+            'password' = 'openflow'
+            'type' = 'POX'
+            [[[["OPTIONS"]]]]
+                # Specify the Option for mininet
+                'log_level' = 'DEBUG'
+                'component' = 'samples.of_tutorial'
