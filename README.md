@@ -17,7 +17,7 @@ from the command line.
 Test Launch
 ------------
 
-In order to run Mininet, you must have:
+In order to run OFAutomation, you must have:
 
 * A Linux 2.6.26 or greater kernel compiled with network namespace support 
   enabled (see INSTALL for additional information.)
@@ -38,8 +38,11 @@ Examples
 --------
 For more examples, refer 'examples' directory.
 To launch of the given example run as:
+Please find the below link for examples:
+     https://github.com/OFAutomation/OFAutomation/tree/OFAutomation-0.0.1/examples
 
 openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./launcher.py --example CaseParams   
+     
      
 
 ---------

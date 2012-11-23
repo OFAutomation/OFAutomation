@@ -1,0 +1,139 @@
+                               +--------------+
+----------------------------- { Script And Files }  ---------------------------------
+                               +--------------+
+
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_23_Nov_2012_16_21_18/MininetTest_23_Nov_2012_16_21_18.log
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
+                             +----------------------+
+----------------------------- { Script Exec Params }  -------------------------
+                             +----------------------+
+
+	
+	'CASE1': 
+	'destination': 'h2'
+	 'STEP1': 
+	'host': 'h2'
+	
+	
+	 'mail': 'paxweb@paxterrasolutions.com'
+	 'testcases': '[1
+	2]'
+	 'log_dir': '/home/user/Desktop/openflow_logs/'
+	
+
+                             +-----------------+
+----------------------------- { Components Used }  ---------------------------------
+                             +-----------------+
+	POX2
+	Mininet1
+
+
+                             +--------------+
+----------------------------- { Topology }  ---------------------------------
+                             +--------------+
+
+	
+	'POX2': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'POX'
+	 'user': 'openflow'
+	 'OPTIONS': 
+	'component': 'samples.of_tutorial'
+	 'log_level': 'DEBUG'
+	
+	
+	 'Mininet1': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'Mininet'
+	 'user': 'openflow'
+	 'OPTIONS': 
+	'topo': 'single'
+	 'topocount': '3'
+	 'switch': 'ovsk'
+	 'controller': 'remote'
+	
+	
+	
+------------------------------------------------------------------------------------------------------------------
+
+
+************************************
+ CASE INIT 
+*************************************
+
+2012-11-23 16:21:18,290 - MininetTest - INFO - Creating component Handle: POX2
+2012-11-23 16:21:19,314 - MininetTest - ERROR - No route to the Host openflow@192.168.56.101
+2012-11-23 16:21:19,715 - MininetTest - ERROR - Connection failed to the hostopenflow@192.168.56.101
+2012-11-23 16:21:19,716 - MininetTest - ERROR - Failed to connect to the POX controller
+2012-11-23 16:21:19,716 - MininetTest - INFO - Creating component Handle: Mininet1
+2012-11-23 16:21:20,723 - MininetTest - ERROR - No route to the Host openflow@192.168.56.101
+2012-11-23 16:21:21,124 - MininetTest - ERROR - Connection failed to the hostopenflow@192.168.56.101
+2012-11-23 16:21:21,124 - MininetTest - ERROR - Failed to connect to the Mininet
+
+
+*****************************
+ Result summary for Testcase1
+*****************************
+
+
+[2012-11-23 16:21:21.125244] [MininetTest] [CASE]  Testing the configuration of the host
+
+[2012-11-23 16:21:21.125323] [MininetTest] [STEP]  1.1: Host IP Checking using checkIP
+2012-11-23 16:21:21,125 - MininetTest - ERROR - Connection failed to the host
+
+[2012-11-23 16:21:21.125495] [MininetTest] [STEP]  1.2: Verifying the result
+2012-11-23 16:21:21,126 - MininetTest - INFO - Verifying the Expected is equal to the actual or not using assert_equal
+2012-11-23 16:21:21,126 - MininetTest - ERROR - Host h2 IP address didn't configured
+2012-11-23 16:21:21,126 - MininetTest - WARNING - Assertion Failed
+
+
+**********************************
+ Result: Failed 
+**********************************
+
+
+
+*****************************
+ Result summary for Testcase2
+*****************************
+
+
+[2012-11-23 16:21:21.126875] [MininetTest] [CASE]  Testing Reachabilty of all the hosts
+
+[2012-11-23 16:21:21.126941] [MininetTest] [STEP]  2.1: Checking Hosts reachability by using pingall
+2012-11-23 16:21:21,126 - MininetTest - ERROR - Connection failed to the host
+
+[2012-11-23 16:21:21.127110] [MininetTest] [STEP]  2.2: Verifying the result
+2012-11-23 16:21:21,127 - MininetTest - INFO - Verifying the Expected is equal to the actual or not using assert_equal
+2012-11-23 16:21:21,127 - MininetTest - ERROR - Hosts are not reachable
+2012-11-23 16:21:21,127 - MininetTest - WARNING - Assertion Failed
+
+
+**********************************
+ Result: Failed 
+**********************************
+
+2012-11-23 16:21:21,127 - MininetTest - ERROR - Connection failed to the host
+
+
+
+ ******************************
+	Test Execution Summary
+
+ ******************************
+
+ Test Start           : 23 Nov 2012 16:21:18
+ Test End             : 23 Nov 2012 16:21:21
+ Execution Time       : 0:00:02.839319
+ Total tests planned  : 2
+ Total tests RUN      : 2
+ Total Pass           : 0
+ Total Fail           : 2
+ Total No Result      : 0
+ Success Percentage   : 0%
+ Execution Result     : 100%
+2012-11-23 16:21:21,127 - MininetTest - ERROR - Connection failed to the host

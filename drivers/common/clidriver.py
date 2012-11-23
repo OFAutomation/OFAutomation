@@ -21,6 +21,7 @@ class CLI(Component):
            and will return the handle. 
         '''
         ssh_newkey = 'Are you sure you want to continue connecting'
+        print user_name+" AAAAAAAAAAAAAA"+ip_address
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT],1)
         

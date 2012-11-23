@@ -1,0 +1,68 @@
+                               +--------------+
+----------------------------- { Script And Files }  ---------------------------------
+                               +--------------+
+
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_23_Nov_2012_16_33_22/MininetTest_23_Nov_2012_16_33_22.log
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
+                             +----------------------+
+----------------------------- { Script Exec Params }  -------------------------
+                             +----------------------+
+
+	
+	'CASE1': 
+	'destination': 'h2'
+	 'STEP1': 
+	'host': 'h2'
+	
+	
+	 'mail': 'paxweb@paxterrasolutions.com'
+	 'testcases': '[1
+	2]'
+	 'log_dir': '/home/user/Desktop/openflow_logs/'
+	
+
+                             +-----------------+
+----------------------------- { Components Used }  ---------------------------------
+                             +-----------------+
+	POX2
+	Mininet1
+
+
+                             +--------------+
+----------------------------- { Topology }  ---------------------------------
+                             +--------------+
+
+	
+	'POX2': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'POX'
+	 'user': 'openflow'
+	 'OPTIONS': 
+	'component': 'samples.of_tutorial'
+	 'log_level': 'DEBUG'
+	
+	
+	 'Mininet1': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'Mininet'
+	 'user': 'openflow'
+	 'OPTIONS': 
+	'topo': 'single'
+	 'topocount': '3'
+	 'switch': 'ovsk'
+	 'controller': 'remote'
+	
+	
+	
+------------------------------------------------------------------------------------------------------------------
+
+
+************************************
+ CASE INIT 
+*************************************
+
+2012-11-23 16:33:22,566 - MininetTest - INFO - Creating component Handle: POX2
