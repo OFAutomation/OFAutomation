@@ -39,7 +39,8 @@ Examples
 For more examples, refer 'examples' directory.
 Please find the below link for examples:
      https://github.com/OFAutomation/OFAutomation/tree/OFAutomation-0.0.1/examples
-To launch of the given example run as:
+
+To launch the example give option as --example:
 
 openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./launcher.py --example CaseParams   
      
