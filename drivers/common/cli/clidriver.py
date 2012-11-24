@@ -4,7 +4,7 @@ import struct, fcntl, os, sys, signal
 import sys, re
 sys.path.append("../")
 import pydoc
-pydoc.writedoc('clidriver')
+#pydoc.writedoc('clidriver')
 
 from drivers.component import Component
 class CLI(Component):
@@ -21,7 +21,6 @@ class CLI(Component):
            and will return the handle. 
         '''
         ssh_newkey = 'Are you sure you want to continue connecting'
-        print user_name+" AAAAAAAAAAAAAA"+ip_address
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT],1)
         
@@ -45,6 +44,21 @@ class CLI(Component):
         self.handle.logfile = sys.stdout
         
         return self.handle
+    
+    def runAsSudoUser(self,handle,pwd,default):
+        
+        i = handle.expect([".ssword:*",default, pexpect.EOF])
+        if i==0:
+            handle.sendline(pwd)
+            handle.sendline("\r")
+
+        if i==1:
+            handle.expect(default)
+        
+        if i==2:
+            main.log.error("Unable to run as Sudo user")
+            
+        return handle
         
 
 

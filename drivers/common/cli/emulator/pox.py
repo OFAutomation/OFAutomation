@@ -33,7 +33,7 @@ class POX(Emulator):
     def exit(self,handle):
         if self.handle:
             self.handle = handle 
-            self.handle.sendline("exit")
+            self.handle.sendline("exit()")
             self.handle.sendline("\r")
         else :
             main.log.error("Connection failed to the host") 

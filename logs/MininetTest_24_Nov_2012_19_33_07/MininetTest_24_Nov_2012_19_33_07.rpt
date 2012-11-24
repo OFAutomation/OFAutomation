@@ -2,10 +2,10 @@
 ----------------------------- { Script And Files }  ---------------------------------
                                +--------------+
 
-	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomation/logs//Topology_19_Nov_2012_13_06_59/Topology_19_Nov_2012_13_06_59.log
-	Test Script :/home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Topology.py
-	Test Params : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Topology.params
-	Topology : /home/paxterra/Documents/AptanaWorkspace/OpenFlowAutomationTests/Topology.tpl
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_24_Nov_2012_19_33_07/MininetTest_24_Nov_2012_19_33_07.log
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
                              +----------------------+
 ----------------------------- { Script Exec Params }  -------------------------
                              +----------------------+
@@ -13,9 +13,13 @@
 	
 	'CASE1': 
 	'destination': 'h2'
+	 'STEP1': 
+	'host': 'h2'
+	
 	
 	 'mail': 'paxweb@paxterrasolutions.com'
-	 'testcases': '[1]'
+	 'testcases': '[1
+	2]'
 	 'log_dir': '/home/user/Desktop/openflow_logs/'
 	
 
@@ -64,10 +68,17 @@
  Result summary for Testcase1
 *****************************
 
-[REPORT] [19 Nov 2012 13:07:03] Host h2 IP address didn't configured
 **********************************
- Result: Failed 
+ Result: Pass 
+***********************************
+
+*****************************
+ Result summary for Testcase2
+*****************************
+
 **********************************
+ Result: Pass 
+***********************************
 
 
  ******************************
@@ -75,13 +86,13 @@
 
  ******************************
 
- Test Start           : 19 Nov 2012 13:06:59
- Test End             : 19 Nov 2012 13:07:03
- Execution Time       : 0:00:04.182888
- Total tests planned  : 1
- Total tests RUN      : 1
- Total Pass           : 0
- Total Fail           : 1
+ Test Start           : 24 Nov 2012 19:33:07
+ Test End             : 24 Nov 2012 19:33:17
+ Execution Time       : 0:00:10.107500
+ Total tests planned  : 2
+ Total tests RUN      : 2
+ Total Pass           : 2
+ Total Fail           : 0
  Total No Result      : 0
- Success Percentage   : 0%
+ Success Percentage   : 100%
  Execution Result     : 100%

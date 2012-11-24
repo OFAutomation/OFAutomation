@@ -7,8 +7,16 @@ path = re.sub("bin$", "", os.getcwd())
 sys.path.append(path+"/Core")
 sys.path.append("../")
 from core.ofautomation import *
-oFAutomation = OFAutomation()
-result = oFAutomation.run()
-result = oFAutomation.cleanup()
-
-
+try :
+    oFAutomation = OFAutomation()
+    try :
+        result = oFAutomation.run()
+        result = oFAutomation.cleanup()
+    except(KeyboardInterrupt):
+        print "Recevied Interrupt,cleaning-up the logs and drivers before exiting"
+        result = oFAutomation.cleanup()
+        
+except(KeyboardInterrupt):
+    print "Recevied Interrupt, terminating Test"
+    exit(0)
+    

@@ -31,12 +31,32 @@ class Mininet(Emulator):
             self.handle.expect("openflow")
             main.log.info("Clearing any residual state or processes")
             self.handle.sendline("sudo mn -c")
+            i = self.handle.expect([".ssword:*", pexpect.EOF])
+            if i==0:
+                main.log.info("Providing the password for sudo user")
+                self.handle.sendline(pwd)
+
+            if i==1:
+                print self.handle.before
+                
             self.handle.sendline("\r")
             self.handle.expect("openflow")
             main.log.info("Creating Virtual network in the VirtualMachine")
             self.handle.sendline("sudo mn --topo "+options['topo']+","+options['topocount']+" --mac --switch "+options['switch']+" --controller "+options['controller'])
-            self.handle.expect("mininet")
-            main.log.info("Virtual network Created Successfully")
+            i = self.handle.expect([".ssword:*","mininet", pexpect.EOF])
+            if i==0:
+                main.log.info("Providing the password for sudo user")
+                self.handle.sendline(pwd)
+                self.handle.expect("mininet")
+                main.log.info("Virtual network Created Successfully")
+
+            if i==1:
+                main.log.info("Virtual network Created Successfully")
+            
+            if i==3:
+                main.log.error("Failed to create Virtual network")
+            
+            return self.handle
         else :
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
             main.log.error("Failed to connect to the Mininet")
