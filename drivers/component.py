@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import pexpect
+import re
 import struct, fcntl, os, sys, signal
 import sys
 from logging import Logger
@@ -38,6 +39,8 @@ class Component(object):
     def cleanup(self):
         self = self
         
-        
-        
-
+    def log_message(self,handle,message):
+        str2 = str(handle).split()
+        str2=re.split("(\.)+", str2[0])
+        temp = str2[len(str2)-1]
+        vars(main)[temp].write(message)

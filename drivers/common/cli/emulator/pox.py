@@ -38,4 +38,8 @@ class POX(Emulator):
         else :
             main.log.error("Connection failed to the host") 
             
+            
+    def log_message(self,msg):
+        super(Emulator, self).log_message(self,msg)
+            
         

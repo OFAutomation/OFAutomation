@@ -92,6 +92,11 @@ class OFAutomation:
         self.logger = Logger()
         self.componentDictionary = {}
         self.componentDictionary = self.topology ['COMPONENT']
+        self.driversList=[]
+        for component in self.componentDictionary :
+            self.driversList.append(self.componentDictionary[component]['type'])
+            
+        self.driversList = list(set(self.driversList))
         self.logger.initlog(self)
         
 
@@ -159,6 +164,10 @@ class OFAutomation:
                 tempObject.exit(tempObject.handle) 
                 self.logger.testSummary(self)
                 self.reportFile.close()
+                # Closing all the driver's session files
+                for driver in self.driversList:
+                    vars(self)[component].close()
+                    
         except(Exception):
             result = self.FALSE
                 
@@ -318,6 +327,10 @@ class Logger:
            
         main.LogFileName = logdir + "/" + main.TEST + "_" +str(currentTime) + ".log"
         main.ReportFileName = logdir + "/" + main.TEST + "_" + str(currentTime) + ".rpt"
+        
+        for component in main.driversList:
+            vars(main)[component] = logdir+"/"+component+".session"
+            vars(main)[component] = open(vars(main)[component],"w+")
         
         #### Add log-level - Report
         logging.addLevelName(9, "REPORT")

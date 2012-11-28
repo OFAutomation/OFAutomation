@@ -68,7 +68,11 @@ class Mininet(Emulator):
         if self.handle :
             main.log.info("Checking reachabilty to the hosts using pingall")
             self.handle.sendline("pingall")
-            self.handle.expect("mininet")
+            try :
+                self.handle.expect("mininet")
+            except:
+                main.log.error("Timeout exceeded")
+                
             pattern = 'Results\:\s0\%\sdropped\s\(0\/\d+\slost\)\s*$'
             result=self.handle.before
             if utilities.assert_matches(expect=pattern,actual=result,onpass="All hosts are reaching",onfail="Unable to reach all the hosts"):
@@ -101,5 +105,8 @@ class Mininet(Emulator):
             self.handle.sendline("exit")
             self.handle.sendline("\r")
         else :
-            main.log.error("Connection failed to the host") 
+            main.log.error("Connection failed to the host")
             
+        
+    def log_message(self,msg):
+        super(Emulator, self).log_message(self,msg)
