@@ -2,7 +2,7 @@
 ----------------------------- { Script And Files }  ---------------------------------
                                +--------------+
 
-	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_28_Nov_2012_17_28_53/MininetTest_28_Nov_2012_17_28_53.log
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_30_Nov_2012_20_24_53/MininetTest_30_Nov_2012_20_24_53.log
 	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
 	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
 	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
@@ -17,9 +17,10 @@
 	'host': 'h2'
 	
 	
-	 'mail': 'paxweb@paxterrasolutions.com'
-	 'testcases': '[1
-	2]'
+	 'mail': 'anilkumar.s@paxterrasolutions.com
+	anil4haart@gmail.com'
+	 'testcases': '1
+	2'
 	 'log_dir': '/home/user/Desktop/openflow_logs/'
 	
 
@@ -86,9 +87,9 @@
 
  ******************************
 
- Test Start           : 28 Nov 2012 17:28:53
- Test End             : 28 Nov 2012 17:29:08
- Execution Time       : 0:00:14.553007
+ Test Start           : 30 Nov 2012 20:24:53
+ Test End             : 30 Nov 2012 20:25:04
+ Execution Time       : 0:00:11.341385
  Total tests planned  : 2
  Total tests RUN      : 2
  Total Pass           : 2

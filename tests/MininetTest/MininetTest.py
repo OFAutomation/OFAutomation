@@ -15,8 +15,9 @@ class MininetTest:
         result = main.Mininet1.checkIP(main.params['CASE1']['destination'])
         main.step("Verifying the result")
         utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h2 IP address configured",onfail="Host h2 IP address didn't configured") 
-        
-            
+        main.Mininet1.log_message("Mininet Session log message")
+        main.POX2.log_message("Pox session Log message") 
+           
     def CASE2(self,main):
         '''
         Testing of the reachability of the hosts by using pingall of Mininet driver

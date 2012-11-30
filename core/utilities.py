@@ -3,6 +3,15 @@ import re
 from configobj import ConfigObj
 import pydoc
 import ast
+# Import smtplib for the actual sending function
+import smtplib
+# For guessing MIME type
+import mimetypes
+# Import the email modules we'll need
+import email
+import os
+import email.mime.application
+
 #pydoc.writedoc('utilities')
 '''
    Utilities will take care about the basic functions like :
@@ -187,6 +196,35 @@ class Utilities:
                     
             
         return newArgs
+    
+    def send_mail(self):
+        # Create a text/plain message
+        msg = email.mime.Multipart.MIMEMultipart()
+        msg['Subject'] = 'Auto Generated Mial from OFAutomation Test Framework'
+        msg['From'] = 'paxweb@paxterrasolutions.com'
+        msg['To'] = main.mail
+        #msg['Cc'] = 'paxweb@paxterrasolutions.com'
+        
+        # The main body is just another attachment
+        body = email.mime.Text.MIMEText(main.testResult)
+        msg.attach(body)
+        
+        # Attachment
+        for filename in os.listdir(main.logdir):
+            filepath = main.logdir+"/"+filename
+            fp=open(filepath,'rb')
+            att = email.mime.application.MIMEApplication(fp.read(),_subtype="")
+            fp.close()
+            att.add_header('Content-Disposition','attachment',filename=filename)
+            msg.attach(att)
+        
+        smtp = smtplib.SMTP('mail.paxterrasolutions.com')
+        smtp.starttls()
+        smtp.login('paxweb@paxterrasolutions.com','pax@peace')
+        smtp.sendmail(msg['From'],[msg['To']], msg.as_string())
+        smtp.quit()
+        return main.TRUE        
+        
            
     def parse(self,fileName):
         '''
