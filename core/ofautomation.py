@@ -2,8 +2,6 @@
 import sys
 import os
 import re
-import logging
-import datetime
 import __builtin__
 '''
    ofautomation is the main module.
@@ -24,11 +22,7 @@ from core.utilities import Utilities
 from drivers.component import *
 import logging 
 import datetime
-import random
 from optparse import OptionParser
-
-import pydoc
-#pydoc.writedoc('ofautomation')
 
 class OFAutomation:
     '''
@@ -44,11 +38,18 @@ class OFAutomation:
            Initialise the component handles specified in the topology file of the specified test.
           
         '''
+        # Initialization of the variables.
         __builtin__.main = self
         self.TRUE = 1
         self.FALSE = 0
         self.ERROR = -1
+        self.FAIL = False
+        self.PASS = True
         self.CASERESULT = self.TRUE
+        self.init_result = self.TRUE
+        self.testResult = "Summary"
+        
+        # Parsing of commandline options.
         optionParser = OptionParser()
         optionParser.add_option("-t", "--test", dest="testname",
                   help="test for execution", metavar="")
@@ -58,10 +59,14 @@ class OFAutomation:
                   help="Logs Directory", metavar="Directoy")
         optionParser.add_option("-e", "--example", dest="example",
                   help="Example Tests Execution", metavar="Option to execute Examples")
+        optionParser.add_option("-c", "--testcases", dest="testcases",
+                  help="Test Cases for execution", metavar="Test Cases for execution")
+        optionParser.add_option("-m", "--mail", dest="mail",
+                  help="mailing list, seperated by comma", metavar="mailing list, seperated by comma")
         (options, args) = optionParser.parse_args()
         
         
-        
+        # Verifying the test or example specified or not.
         if options.testname:
             self.TEST = options.testname
             classPath = "tests."+self.TEST+"."+self.TEST
@@ -71,11 +76,27 @@ class OFAutomation:
             self.tests_path = path+"/examples/"
             classPath = "examples."+self.TEST+"."+self.TEST
         else :
-            print "test Name not specified"
+            print "Test or Example not specified please specify the --test <test name > or --example <example name>"
             sys.exit(0)
         
-        testModule = __import__(classPath, globals(), locals(), [self.TEST], -1)
-        testClass = getattr(testModule, self.TEST)
+        #Verifying Log directory option      
+        if options.logdir:
+            self.logdir = options.logdir
+        else :
+            self.logdir = self.FALSE
+            
+        try :
+            testModule = __import__(classPath, globals(), locals(), [self.TEST], -1)
+        except(ImportError):
+            print "Tere is no test like "+self.TEST
+            sys.exit(0)
+            
+        try :
+            testClass = getattr(testModule, self.TEST)
+        except(AttributeError):
+            print self.TEST+ " module object has no attribute :"+self.TEST
+            sys.exit(0)
+ 
         self.testObject = testClass()
 
         connect_options = {}
@@ -84,11 +105,35 @@ class OFAutomation:
         __builtin__.utilities = Utilities()
         testHandler = TestHandler()
         self.params = testHandler.parseParams(classPath)
-        print self.params
-        self.params = self.params['PARAMS']
-        self.topology = testHandler.parseTopology(classPath) 
-        self.topology = self.topology['TOPOLOGY']
-        self.testcases_list = eval(self.params['testcases'])
+        try :
+            self.params = self.params['PARAMS']
+        except(KeyError):
+            print "Error with the params file: Either the file not specified or the format is not correct"
+            sys.exit(0)
+            
+        self.topology = testHandler.parseTopology(classPath)
+        try :
+            self.topology = self.topology['TOPOLOGY']
+        except(KeyError):
+            print "Error with the Topology file: Either the file not specified or the format is not correct"
+            sys.exit(0)
+            
+        # Checking the mailing list 
+        if options.mail:
+            self.mail = options.mail
+        elif self.params['mail']:
+            self.mail = self.params['mail']
+        else :
+            self.mail = 'paxweb@paxterrasolutions.com'
+             
+        #Getting Test cases list 
+        if options.testcases:
+            self.testcases_list = re.sub("(\[|\])", "", self.testcases_list)
+            self.testcases_list = eval(options.testcases+",")
+        else :
+            self.params['testcases'] = re.sub("(\[|\])", "", self.params['testcases'])
+            self.testcases_list = eval(self.params['testcases']+",")
+            
         self.logger = Logger()
         self.componentDictionary = {}
         self.componentDictionary = self.topology ['COMPONENT']
@@ -96,11 +141,9 @@ class OFAutomation:
         for component in self.componentDictionary :
             self.driversList.append(self.componentDictionary[component]['type'])
             
-        self.driversList = list(set(self.driversList))
+        self.driversList = list(set(self.driversList)) # Removing duplicates.
         self.logger.initlog(self)
-        
 
-        
         # Creating Drivers Handles
         initString = "\n************************************\n CASE INIT \n*************************************\n"
         self.log.exact(initString)
@@ -113,12 +156,18 @@ class OFAutomation:
             driver_options = self.componentDictionary[component]['OPTIONS']
             driverName = self.componentDictionary[component]['type']
             classPath = self.getDriverPath(driverName.lower())
-            driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
-            driverClass = getattr(driverModule, driverName)
-            driverObject = driverClass()
-            driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
-            vars(self)[component] = driverObject
+            try :
+                driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
+                driverClass = getattr(driverModule, driverName)
+                driverObject = driverClass()
+                driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
+                vars(self)[component] = driverObject
+            except(AttributeError):
+                self.log.error("There is no "+driverName+"component driver")
+                self.init_result = self.FAIL
+                          
                         
+    
     def run(self):
         '''
            The Execution of the test script's cases listed in the Test params file will be done here. 
@@ -157,20 +206,24 @@ class OFAutomation:
            else return FALSE
 
         '''
+        #utilities.send_mail()
         result = self.TRUE
         try :
             for component in self.componentDictionary.keys():
                 tempObject  = vars(self)[component]    
                 tempObject.exit(tempObject.handle) 
-                self.logger.testSummary(self)
-                self.reportFile.close()
-                # Closing all the driver's session files
-                for driver in self.driversList:
-                    vars(self)[component].close()
-                    
-        except(Exception):
-            result = self.FALSE
                 
+            self.logger.testSummary(self)
+            self.reportFile.close()
+            # Closing all the driver's session files
+            for driver in self.driversList:
+                vars(self)[driver].close()
+            
+            utilities.send_mail()
+        except(Exception):
+            print " There is an error with closing hanldes"
+            result = self.FALSE
+                    
         return result
         
     
@@ -252,7 +305,7 @@ class TestHandler:
         '''
         paramsPath = re.sub("\.","/",paramsPath)
         paramsPath = re.sub("tests|examples","",paramsPath)
-        print main.tests_path+"/"+paramsPath+".params"
+        #print main.tests_path+"/"+paramsPath+".params"
         params = utilities.parse(main.tests_path+"/"+paramsPath+".params")
         paramsAsString = str(params)
         return eval(paramsAsString) 
@@ -322,14 +375,18 @@ class Logger:
         main.STARTTIME = datetime.datetime.now() 
 
         currentTime = re.sub("-|\s|:|\.", "_", str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S")))
-        logdir = logs_path + "/" + main.TEST + "_" + currentTime
-        os.mkdir(logdir)
+        if main.logdir:
+            main.logdir = main.logdir+"/" + main.TEST + "_" + currentTime
+        else:
+            main.logdir = logs_path + "/" + main.TEST + "_" + currentTime
+            
+        os.mkdir(main.logdir)
            
-        main.LogFileName = logdir + "/" + main.TEST + "_" +str(currentTime) + ".log"
-        main.ReportFileName = logdir + "/" + main.TEST + "_" + str(currentTime) + ".rpt"
+        main.LogFileName = main.logdir + "/" + main.TEST + "_" +str(currentTime) + ".log"
+        main.ReportFileName = main.logdir + "/" + main.TEST + "_" + str(currentTime) + ".rpt"
         
         for component in main.driversList:
-            vars(main)[component] = logdir+"/"+component+".session"
+            vars(main)[component] = main.logdir+"/"+component+".session"
             vars(main)[component] = open(vars(main)[component],"w+")
         
         #### Add log-level - Report
@@ -435,6 +492,7 @@ class Logger:
         testResult =  testResult + "\n Execution Result     : " + str(main.TOTAL_TC_EXECPERCENT) + "%"
         
         #main.log.report(testResult)
+        main.testResult = testResult
         main.log.exact(testResult)
                 
     def updateCaseResults(self,main):

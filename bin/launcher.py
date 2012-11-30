@@ -10,7 +10,9 @@ from core.ofautomation import *
 try :
     oFAutomation = OFAutomation()
     try :
-        result = oFAutomation.run()
+        if oFAutomation.init_result:
+            result = oFAutomation.run()
+        
         result = oFAutomation.cleanup()
     except(KeyboardInterrupt):
         print "Recevied Interrupt,cleaning-up the logs and drivers before exiting"

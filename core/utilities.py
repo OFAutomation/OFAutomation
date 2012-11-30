@@ -195,8 +195,11 @@ class Utilities:
         self.fileName = fileName
         matchFileName = re.match(r'(.*)\.(cfg|params|topo)',self.fileName,re.M|re.I)    
         if matchFileName:
-            parsedInfo = ConfigObj(self.fileName)
-            return parsedInfo 
+            try :
+                parsedInfo = ConfigObj(self.fileName)
+                return parsedInfo
+            except :
+                print "There is no such file to parse "+fileName 
         else:
             return 0   
 
