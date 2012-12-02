@@ -23,7 +23,7 @@ class Topology:
     def __init__(self):
         self.default = ""
                 
-    def CASE1(self,main):
+    def CASE1(self, main):
         '''
         This will showcase the usage of Topology
         '''
@@ -31,6 +31,6 @@ class Topology:
         main.step("Mininet1 specified in Topology , using the Mininet1 to check host ip")
         result = main.Mininet1.checkIP(main.params['CASE1']['destination'])
         main.step("Verifying the result")
-        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h2 IP address configured",onfail="Host h2 IP address didn't configured") 
+        utilities.assert_equals(expect=main.TRUE, actual=result, onpass="Host h2 IP address configured", onfail="Host h2 IP address didn't configured") 
         
         

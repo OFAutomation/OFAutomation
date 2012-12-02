@@ -16,7 +16,7 @@ class StepParams:
     def __init__(self):
         self.default = ""
                 
-    def CASE1(self,main):
+    def CASE1(self, main):
         '''
         This example will showcase the usage of STEP level parameters to specify the host as h2
         '''
@@ -24,10 +24,10 @@ class StepParams:
         main.step("Host IP Checking using checkIP")
         result = main.Mininet1.checkIP(main.params['CASE1']['STEP1']['host'])
         main.step("Verifying the result")
-        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h2 IP address configured",onfail="Host h2 IP address didn't configured") 
+        utilities.assert_equals(expect=main.TRUE, actual=result, onpass="Host h2 IP address configured", onfail="Host h2 IP address didn't configured") 
         
 
-    def CASE2(self,main):
+    def CASE2(self, main):
         '''
                 This example will showcase the usage of STEP level parameters to specify the host as h3
         '''
@@ -35,4 +35,4 @@ class StepParams:
         main.step("Host IP Checking using checkIP")
         result = main.Mininet1.checkIP(main.params['CASE2']['STEP1']['host'])
         main.step("Verifying the result")
-        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h3 IP address configured",onfail="Host h3 IP address didn't configured")             
+        utilities.assert_equals(expect=main.TRUE, actual=result, onpass="Host h3 IP address configured", onfail="Host h3 IP address didn't configured")             

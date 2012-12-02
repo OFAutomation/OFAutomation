@@ -19,7 +19,7 @@ sys.path.append(core_path )
 sys.path.append(tests_path)
 
 from core.utilities import Utilities
-from drivers.component import *
+from drivers.component import Component
 import logging 
 import datetime
 from optparse import OptionParser
@@ -48,6 +48,8 @@ class OFAutomation:
         self.CASERESULT = self.TRUE
         self.init_result = self.TRUE
         self.testResult = "Summary"
+        self.stepName =""
+        self.EXPERIMENTAL_MODE = False   
         
         # Parsing of commandline options.
         optionParser = OptionParser()
@@ -128,8 +130,8 @@ class OFAutomation:
              
         #Getting Test cases list 
         if options.testcases:
-            self.testcases_list = re.sub("(\[|\])", "", self.testcases_list)
-            self.testcases_list = eval(options.testcases+",")
+            testcases_list = re.sub("(\[|\])", "", options.testcases)
+            self.testcases_list = eval(testcases_list+",")
         else :
             self.params['testcases'] = re.sub("(\[|\])", "", self.params['testcases'])
             self.testcases_list = eval(self.params['testcases']+",")
@@ -153,7 +155,14 @@ class OFAutomation:
         for component in self.componentDictionary.keys():
             global driver_options
             self.log.info("Creating component Handle: "+component)
-            driver_options = self.componentDictionary[component]['OPTIONS']
+            #### R
+             
+            if 'COMPONENTS' in self.componentDictionary[component].keys():
+                driver_options =self.componentDictionary[component]['COMPONENTS']
+            else:
+                driver_options = {}
+                
+            #driver_options = self.componentDictionary[component]['OPTIONS']
             driverName = self.componentDictionary[component]['type']
             classPath = self.getDriverPath(driverName.lower())
             try :
@@ -163,7 +172,7 @@ class OFAutomation:
                 driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
                 vars(self)[component] = driverObject
             except(AttributeError):
-                self.log.error("There is no "+driverName+"component driver")
+                self.log.error("There is no "+driverName+" component driver")
                 self.init_result = self.FAIL
                           
                         
@@ -185,7 +194,12 @@ class OFAutomation:
         result = self.TRUE
         for self.CurrentTestCaseNumber in self.testcases_list:
             self.stepCount = 1
-            self.log.exact("\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n")
+            caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
+            self.log.exact(caseHeader) 
+            caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
+            for driver in self.driversList:
+                vars(self)[driver].write(caseHeader)
+                
             try :
                 methodToCall = getattr(self.testObject, "CASE"+str(self.CurrentTestCaseNumber))
                 methodToCall(self)
@@ -196,7 +210,15 @@ class OFAutomation:
                 result = self.FALSE
                 
                 
-        return result
+                
+            previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
+
+            stepHeader = "\n-------------------------------------------------\nEnd of Step "+previousStep+"\n-------------------------------------------------\n"
+            caseFooter = "\n*************************************************\nEnd of Test case "+str(self.CurrentTestCaseNumber)+"\n*************************************************\n"
+            for driver in self.driversList:
+                vars(self)[driver].write(stepHeader+"\n"+caseFooter)
+                
+        return result   
             
 
     def cleanup(self):
@@ -211,7 +233,8 @@ class OFAutomation:
         try :
             for component in self.componentDictionary.keys():
                 tempObject  = vars(self)[component]    
-                tempObject.exit(tempObject.handle) 
+                tempObject.exit(tempObject.handle)
+                tempObject.execute(cmd="exit",prompt="(.*)",timeout=120) 
                 
             self.logger.testSummary(self)
             self.reportFile.close()
@@ -248,11 +271,19 @@ class OFAutomation:
         '''
            The step information of the test-case will append to the logs.
         '''
+        previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
         self.stepName = stepDesc
         stepName = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount)+": "+ str(stepDesc) + ""
         self.log.step(stepName)
+        stepHeader = ""
+        if self.stepCount > 1 :
+            stepHeader = "\n-------------------------------------------------\nEnd of Step "+previousStep+"\n-------------------------------------------------\n"
+        
+        stepHeader += "\n-------------------------------------------------\nStart of Step"+stepName+"\n-------------------------------------------------\n" 
+        for driver in self.driversList:
+            vars(self)[driver].write(stepHeader)
+            
         self.stepCount = self.stepCount+ 1
-        #print self.stepCount
        
     def case(self,testCaseName):
         '''
@@ -261,6 +292,9 @@ class OFAutomation:
         self.CurrentTestCase = testCaseName 
         testCaseName = " " + str(testCaseName) + ""
         self.log.case(testCaseName)
+        caseHeader = testCaseName+"\n*************************************************\n" 
+        for driver in self.driversList:
+            vars(self)[driver].write(caseHeader)
         
     def testDesc(self,description):
         '''
@@ -358,6 +392,9 @@ class Logger:
         logfile = open(main.LogFileName,"w+")
         logfile.write (logmsg)
         print logmsg
+        # Adding Header for session logs
+        for driver in main.driversList:
+            vars(main)[driver].write(logmsg)
         
         #self.log.report(logmsg);
         logfile.close()

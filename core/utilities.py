@@ -246,4 +246,3 @@ if __name__ != "__main__":
     import sys
     
     sys.modules[__name__] = Utilities()    
-

@@ -3,7 +3,6 @@ import pexpect
 import struct
 import fcntl
 import os
-import sys
 import signal
 import re
 import sys
@@ -22,41 +21,31 @@ class Mininet(Emulator):
     def __init__(self):
         super(Emulator, self).__init__()
         self.handle = self
-        
+        self.wrapped = sys.modules[__name__]
+
     def connect(self,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
         self.handle = super(Emulator, self).connect(user_name, ip_address, pwd)
         if self.handle :
-            self.handle.logfile = sys.stdout
+            #self.handle.logfile = sys.stdout
             self.handle.expect("openflow")
             main.log.info("Clearing any residual state or processes")
-            self.handle.sendline("sudo mn -c")
-            i = self.handle.expect([".ssword:*", pexpect.EOF])
-            if i==0:
-                main.log.info("Providing the password for sudo user")
-                self.handle.sendline(pwd)
+            result = self.execute(cmd="sudo mn -c",timeout=120,prompt="[p|P]assword")
 
-            if i==1:
-                print self.handle.before
-                
-            self.handle.sendline("\r")
-            self.handle.expect("openflow")
-            main.log.info("Creating Virtual network in the VirtualMachine")
-            self.handle.sendline("sudo mn --topo "+options['topo']+","+options['topocount']+" --mac --switch "+options['switch']+" --controller "+options['controller'])
-            i = self.handle.expect([".ssword:*","mininet", pexpect.EOF])
-            if i==0:
-                main.log.info("Providing the password for sudo user")
-                self.handle.sendline(pwd)
-                self.handle.expect("mininet")
-                main.log.info("Virtual network Created Successfully")
+            main.log.info("Password providing for running at sudo mode")
+            result2 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
+            #preparing command to launch mininet
+            main.log.info("Launching netwrok using mininet")   
+            cmdString = "sudo mn --topo "+options['topo']+","+options['topocount']+" --mac --switch "+options['switch']+" --controller "+options['controller']
+            result4 = self.execute(cmd=cmdString,timeout=120,prompt="mininet")
+            pattern = '[p|P]assword'
+            result3 = ''
+            if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
+                result3 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
+            else:
+                result3 = result4
+                main.log.info("Network is launching")
 
-            if i==1:
-                main.log.info("Virtual network Created Successfully")
-            
-            if i==3:
-                main.log.error("Failed to create Virtual network")
-            
-            return self.handle
         else :
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
             main.log.error("Failed to connect to the Mininet")
@@ -67,15 +56,9 @@ class Mininet(Emulator):
         '''
         if self.handle :
             main.log.info("Checking reachabilty to the hosts using pingall")
-            self.handle.sendline("pingall")
-            try :
-                self.handle.expect("mininet")
-            except:
-                main.log.error("Timeout exceeded")
-                
+            response = self.execute(cmd="pingall",prompt="mininet>",timeout=120)
             pattern = 'Results\:\s0\%\sdropped\s\(0\/\d+\slost\)\s*$'
-            result=self.handle.before
-            if utilities.assert_matches(expect=pattern,actual=result,onpass="All hosts are reaching",onfail="Unable to reach all the hosts"):
+            if utilities.assert_matches(expect=pattern,actual=response,onpass="All hosts are reaching",onfail="Unable to reach all the hosts"):
                 return main.TRUE
             else:
                 return main.FALSE
@@ -87,26 +70,28 @@ class Mininet(Emulator):
             Verifies the host's ip configured or not.
         '''
         if self.handle :
-            self.handle.sendline(host+" ifconfig")
-            self.handle.expect("mininet")
+            main.log.info("Pinging host "+host) 
+            response = self.execute(cmd=host+" ifconfig",prompt="mininet>",timeout=120)
+
             pattern = "inet\s(addr|Mask):([0-1]{1}[0-9]{1,2}|2[0-4][0-9]|25[0-5]|[0-9]{1,2}).([0-1]{1}[0-9]{1,2}|2[0-4][0-9]|25[0-5]|[0-9]{1,2}).([0-1]{1}[0-9]{1,2}|2[0-4][0-9]|25[0-5]|[0-9]{1,2}).([0-1]{1}[0-9]{1,2}|2[0-4][0-9]|25[0-5]|[0-9]{1,2})"
-            result=self.handle.before
-            if utilities.assert_matches(expect=pattern,actual=result,onpass="Host Ip configured properly",onfail="Host IP didn't found") :
+            if utilities.assert_matches(expect=pattern,actual=response,onpass="Host Ip configured properly",onfail="Host IP didn't found") :
                 return main.TRUE
             else:
                 return main.FALSE
         else :
             main.log.error("Connection failed to the host") 
             
-        
+
     def exit(self,handle):
+        response = ''
         if self.handle:
-            self.handle = handle 
-            self.handle.sendline("exit")
-            self.handle.sendline("\r")
+            self.handle = handle
+            response = self.execute(cmd="exit",prompt="(.*)",timeout=120)
         else :
             main.log.error("Connection failed to the host")
-            
-        
-    def log_message(self,msg):
-        super(Emulator, self).log_message(self,msg)
+            response = main.FALSE
+        return response  
+
+if __name__ != "__main__":
+    import sys
+    sys.modules[__name__] = Mininet()

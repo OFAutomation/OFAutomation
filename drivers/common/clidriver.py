@@ -20,9 +20,12 @@ class CLI(Component):
            It will take user_name ,ip_address and password as arguments<br>
            and will return the handle. 
         '''
+        child = super(CLI, self).connect(self)
         ssh_newkey = 'Are you sure you want to continue connecting'
+        refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
-        i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT],1)
+        self.handle.logfile = vars(main)[child]
+        i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],1)
         
         if i==0:    
             print "I say yes"
@@ -39,12 +42,62 @@ class CLI(Component):
         elif i==3: #timeout
             main.log.error("No route to the Host "+user_name+"@"+ip_address)
             return main.FALSE
+        elif i==4:
+            main.log.error("ssh: connect to host 192.168.150.90 port 22: Connection refused")
+            return main.FALSE
 
         self.handle.sendline("\r")
-        self.handle.logfile = sys.stdout
+        #self.handle.logfile = sys.stdout
         
         return self.handle
     
+    
+    def execute(self, **execparams):
+        '''
+        It facilitates the command line execution of a given command. It has arguments as :
+        cmd => represents command to be executed,
+        prompt => represents expect command prompt or output,
+        timeout => timeout for command execution,
+        more => to provide a key press if it is on.
+
+        It will return output of command exection.
+        '''
+        defaultPrompt = '.*[$>\#]'
+        args = utilities.parse_args(["CMD", "TIMEOUT", "PROMPT", "MORE"], **execparams)
+        expectPrompt = args["PROMPT"] if args["PROMPT"] else defaultPrompt
+        self.LASTRSP = ""
+        timeoutVar = args["TIMEOUT"] if args["TIMEOUT"] else 10
+        cmd = ''
+        if args["CMD"]:
+            cmd = args["CMD"]
+        else :
+            return 0
+        if args["MORE"] == None:
+            args["MORE"] = " "
+        self.handle.sendline(cmd)
+        self.lastCommand = cmd
+        index = self.handle.expect([expectPrompt, "--More--", 'Command not found.', pexpect.TIMEOUT], timeout = timeoutVar)
+        if index == 0:
+            self.LASTRSP = self.LASTRSP + self.handle.before
+            main.log.info("Expected Prompt Found")
+        elif index == 1:
+            self.LASTRSP = self.LASTRSP + self.handle.before
+            self.handle.send(args["MORE"])
+            main.log.info("Found More screen to go , Sending a key to proceed")
+            indexMore = self.handle.expect(["--More--", expectPrompt], timeout = timeoutVar)
+            while indexMore == 0:
+                main.log.info("Found anoother More screen to go , Sending a key to proceed")
+                self.handle.send(args["MORE"])
+                indexMore = self.handle.expect(["--More--", expectPrompt], timeout = timeoutVar)
+                self.LASTRSP = self.LASTRSP + self.handle.before
+        elif index ==2:
+            main.log.error("Command not found")
+            self.LASTRSP = self.LASTRSP + self.handle.before
+        elif index ==3:
+            main.log.error("Expected Prompt not found , Time Out!!") 
+            return main.FALSE
+        return self.LASTRSP
+        
     def runAsSudoUser(self,handle,pwd,default):
         
         i = handle.expect([".ssword:*",default, pexpect.EOF])
