@@ -11,9 +11,6 @@ sys.path.append("../")
 from drivers.common.cli.emulatordriver import Emulator
 from drivers.common.clidriver import CLI
 
-import pydoc
-pydoc.writedoc('mininet')
-
 class Mininet(Emulator):
     '''
         mininet is the basic driver which will handle the Mininet functions
@@ -25,12 +22,16 @@ class Mininet(Emulator):
 
     def connect(self,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
-        self.handle = super(Emulator, self).connect(user_name, ip_address, pwd)
+        copy = super(Mininet, self).secureCopy(user_name, ip_address,'/home/openflow/mininet/INSTALL', pwd,path+'/lib/Mininet/')
+        self.handle = super(Mininet, self).connect(user_name, ip_address, pwd)
+        
+        self.ssh_handle = self.handle
+        
+        # Copying the readme file to process the 
         if self.handle :
             #self.handle.logfile = sys.stdout
-            self.handle.expect("openflow")
             main.log.info("Clearing any residual state or processes")
-            result = self.execute(cmd="sudo mn -c",timeout=120,prompt="[p|P]assword")
+            result = self.execute(cmd="sudo mn -c",timeout=120,prompt="(.*)")
 
             main.log.info("Password providing for running at sudo mode")
             result2 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
@@ -40,11 +41,11 @@ class Mininet(Emulator):
             result4 = self.execute(cmd=cmdString,timeout=120,prompt="mininet")
             pattern = '[p|P]assword'
             result3 = ''
-            if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
-                result3 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
-            else:
-                result3 = result4
-                main.log.info("Network is launching")
+            #if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
+            #    result3 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
+            #else:
+            #    result3 = result4
+            main.log.info("Network is launching")
 
         else :
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
@@ -65,6 +66,19 @@ class Mininet(Emulator):
         else :
             main.log.error("Connection failed to the host") 
         
+    def pingHost(self,**pingParams):
+        
+        args = utilities.parse_args(["SRC","TARGET","CONTROLLER"],**pingParams)
+        command = args["SRC"] + " ping -" + args["CONTROLLER"] + " " +args ["TARGET"]
+        response = self.execute(cmd=command,prompt="mininet",timeout=120 )
+        if utilities.assert_matches(expect='0% packet loss',actual=response,onpass="No Packet loss",onfail="Host is not reachable"):
+            main.log.info("PING SUCCESS WITH NO PACKET LOSS")
+            return main.TRUE
+        else :
+            main.log.error("PACKET LOST, HOST IS NOT REACHABLE")
+            return main.FALSE
+        
+    
     def checkIP(self,host):
         '''
             Verifies the host's ip configured or not.
@@ -81,6 +95,18 @@ class Mininet(Emulator):
         else :
             main.log.error("Connection failed to the host") 
             
+            
+    def get_version(self):
+        file_input = path+'/lib/Mininet/INSTALL'
+        version = super(Mininet, self).get_version()
+        pattern = 'Mininet\s\w\.\w\.\w\w*'
+        for line in open(file_input,'r').readlines():
+            result = re.match(pattern, line)
+            if result:
+                version = result.group(0)
+                
+            
+        return version    
 
     def exit(self,handle):
         response = ''

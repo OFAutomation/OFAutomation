@@ -26,6 +26,7 @@ class Component(object):
             def experimentHandling(**kwargs):
                 if main.EXPERIMENTAL_MODE == main.TRUE:
                     result = self.experimentRun(**kwargs)
+                    main.log.info("EXPERIMENTAL MODE. API "+str(name)+" not yet implemented. Returning dummy values")
                     return result 
                 else:
                     return main.FALSE
@@ -36,6 +37,7 @@ class Component(object):
         child = str(child).split()
         child=re.split("(\.)+", child[0])
         child = child[len(child)-1]
+        
         return child
     
     def execcmd(self,cmd):
@@ -54,14 +56,27 @@ class Component(object):
         Logger.info(self, msg)
     
     def cleanup(self):
-        self = self
+        return main.TRUE
+    
+    def _updateComponentHeaders(self):
+        for driver in main.driversList:
+            vars(main)[driver].write(main.logHeader)
+            
         
-    def log_message(self,handle,message):
-        str2 = str(handle).split()
-        str2=re.split("(\.)+", str2[0])
-        temp = str2[len(str2)-1]
-        #vars(main)[temp].write(self,message)
-        
+    def log_message(self,child):
+        '''
+        Here finding the for the component to which the 
+        log message based on the called child object.
+        Need to update here.
+        '''
+        child = str(child).split()
+        child=re.split("(\.)+", child[0])
+        child = child[len(child)-1]
+        return child
+    
+    def get_version(self):
+        return "Version unknown"
+
     def experimentRun(self,**kwargs):
         args = utilities.parse_args(["RETURNS"],**kwargs)
         return  args["RETURNS"]    

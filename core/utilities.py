@@ -200,13 +200,18 @@ class Utilities:
     def send_mail(self):
         # Create a text/plain message
         msg = email.mime.Multipart.MIMEMultipart()
-        msg['Subject'] = 'Auto Generated Mial from OFAutomation Test Framework'
+        if main.test_target:
+            sub = "Result summary of \""+main.TEST+"\" run on component \""+main.test_target+"\" Version \""+vars(main)[main.test_target].get_version()+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
+        else :
+            sub = "Result summary of \""+main.TEST+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
+            
+        msg['Subject'] = sub
         msg['From'] = 'paxweb@paxterrasolutions.com'
         msg['To'] = main.mail
         #msg['Cc'] = 'paxweb@paxterrasolutions.com'
         
         # The main body is just another attachment
-        body = email.mime.Text.MIMEText(main.testResult)
+        body = email.mime.Text.MIMEText(main.logHeader+"\n"+main.testResult)
         msg.attach(body)
         
         # Attachment

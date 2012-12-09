@@ -3,8 +3,6 @@ import pexpect
 import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.emulatordriver import Emulator
-import pydoc
-pydoc.writedoc('pox')
 
 class POX(Emulator):
     '''
@@ -27,28 +25,18 @@ class POX(Emulator):
         '''
 
         poxLibPath = 'default'
-        command = "./pox.py " 
-        for item in options.keys():
-            if isinstance(options[item],dict):
-                # iterate
-                command = command + item
-                for items in options[item].keys():
-                    if options[item][items] == "None":
-                        command = command + " --" + items + " "
-                    else :
-                        command = command + " --" + items + "=" + options[item][items] + " "
-            else:
-                if item == 'pox_lib_location':
-                    poxLibPath = options[item]
-                
+        copy = super(POX, self).secureCopy(user_name, ip_address,'/home/openflow/pox/pox/core.py', pwd,path+'/lib/pox/')
         self.handle = super(Emulator, self).connect(user_name, ip_address, pwd)
         self.handle.expect("openflow")
-        if self.handle :#and outputComp:
+        if self.handle:
+            command = self.getcmd(options)
+            print command       
             main.log.info("Entering into POX hierarchy")
             if options['pox_lib_location'] != 'default':
-                self.execute(cmd="cd "+poxLibPath,prompt="/pox\$",timeout=120)
+                self.execute(cmd="cd "+options['pox_lib_location'],prompt="/pox\$",timeout=120)
             else:    
-                self.execute(cmd="cd ~/pox/",prompt="/pox\$",timeout=120)
+                self.execute(cmd="cd ~/OFAutomation-OFAutomation-0.0.1/lib/pox/",prompt="/pox\$",timeout=120)
+            ### launching pox with components    
             main.log.info("launching POX controller with given components")
             self.execute(cmd=command,prompt="DEBUG:",timeout=120)
         else :
@@ -62,11 +50,38 @@ class POX(Emulator):
             main.log.error("Connection failed to the host") 
 
 
+    def get_version(self):
+        file_input = path+'/lib/pox/core.py'
+        version = super(POX, self).get_version()
+        pattern = '\s*self\.version(.*)'
+        import re
+        for line in open(file_input,'r').readlines():
+            result = re.match(pattern, line)
+            if result:
+                version = result.group(0)
+                version = re.sub("\s*self\.version\s*=\s*|\(|\)",'',version)
+                version = re.sub(",",'.',version)
+                version = "POX "+version
+            
+            
+        return version
+            
 
-            
-            
-    def log_message(self,msg):
-        super(Emulator, self).log_message(self,msg)
+    def getcmd(self,options):
+        command = "./pox.py " 
+        for item in options.keys():
+            if isinstance(options[item],dict):
+                command = command + item
+                for items in options[item].keys():
+                    if options[item][items] == "None":
+                        command = command + " --" + items + " "
+                    else :
+                        command = command + " --" + items + "=" + options[item][items] + " "
+            else:
+                if item == 'pox_lib_location':
+                    poxLibPath = options[item]
+
+        return command 
             
 
 if __name__ != "__main__":

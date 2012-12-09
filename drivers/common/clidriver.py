@@ -25,7 +25,7 @@ class CLI(Component):
         refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
         self.handle.logfile = vars(main)[child]
-        i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],1)
+        i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
         if i==0:    
             print "I say yes"
@@ -43,7 +43,7 @@ class CLI(Component):
             main.log.error("No route to the Host "+user_name+"@"+ip_address)
             return main.FALSE
         elif i==4:
-            main.log.error("ssh: connect to host 192.168.150.90 port 22: Connection refused")
+            main.log.error("ssh: connect to host "+ip_address+" port 22: Connection refused")
             return main.FALSE
 
         self.handle.sendline("\r")
@@ -113,7 +113,46 @@ class CLI(Component):
             
         return handle
         
+    def log_message(self,message):
+        child = super(CLI, self).log_message(self)
+        vars(main)[child].write(message)
+    
 
+    def secureCopy(self,user_name, ip_address,filepath, pwd,dst_path):
+        
+        #scp openflow@192.168.56.101:/home/openflow/sample /home/paxterra/Desktop/
 
+        '''
+           Connection will establish to the remote host using ssh.
+           It will take user_name ,ip_address and password as arguments<br>
+           and will return the handle. 
+        '''
+        ssh_newkey = 'Are you sure you want to continue connecting'
+        refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
+        self.handle =pexpect.spawn('scp '+user_name+'@'+ip_address+':'+filepath+' '+dst_path)
+        i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
+        
+        if i==0:    
+            print "I say yes"
+            self.handle.sendline('yes')
+            i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF])
+        if i==1:
+            #print "I give password",
+            self.handle.sendline(pwd)
+            #self.handle.expect(user_name)
+            
+        elif i==2:
+            print "I either got key or connection timeout"
+            pass
+        elif i==3: #timeout
+            main.log.error("No route to the Host "+user_name+"@"+ip_address)
+            return main.FALSE
+        elif i==4:
+            main.log.error("ssh: connect to host "+ip_address+" port 22: Connection refused")
+            return main.FALSE
 
-
+        self.handle.sendline("\r")
+        #self.handle.logfile = sys.stdout
+        
+        return self.handle
+    

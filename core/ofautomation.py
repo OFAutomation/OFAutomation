@@ -23,7 +23,7 @@ from drivers.component import Component
 import logging 
 import datetime
 from optparse import OptionParser
-
+component_handle = Component()
 class OFAutomation:
     '''
     
@@ -40,6 +40,7 @@ class OFAutomation:
         '''
         # Initialization of the variables.
         __builtin__.main = self
+        __builtin__.path = path
         self.TRUE = 1
         self.FALSE = 0
         self.ERROR = -1
@@ -50,7 +51,7 @@ class OFAutomation:
         self.testResult = "Summary"
         self.stepName =""
         self.EXPERIMENTAL_MODE = False   
-        
+        self.test_target = None
         # Parsing of commandline options.
         optionParser = OptionParser()
         optionParser.add_option("-t", "--test", dest="testname",
@@ -66,7 +67,6 @@ class OFAutomation:
         optionParser.add_option("-m", "--mail", dest="mail",
                   help="mailing list, seperated by comma", metavar="mailing list, seperated by comma")
         (options, args) = optionParser.parse_args()
-        
         
         # Verifying the test or example specified or not.
         if options.testname:
@@ -144,13 +144,17 @@ class OFAutomation:
             self.driversList.append(self.componentDictionary[component]['type'])
             
         self.driversList = list(set(self.driversList)) # Removing duplicates.
+        # Checking the test_target option set for the component or not
+        for component in self.componentDictionary.keys():
+            if 'test_target' in self.componentDictionary[component].keys():
+                self.test_target = component
+                 
         self.logger.initlog(self)
 
         # Creating Drivers Handles
         initString = "\n************************************\n CASE INIT \n*************************************\n"
         self.log.exact(initString)
         
-        component_handle = Component()
         self.driverObject = {}
         for component in self.componentDictionary.keys():
             global driver_options
@@ -164,13 +168,17 @@ class OFAutomation:
                 
             #driver_options = self.componentDictionary[component]['OPTIONS']
             driverName = self.componentDictionary[component]['type']
+            
             classPath = self.getDriverPath(driverName.lower())
             try :
                 driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
                 driverClass = getattr(driverModule, driverName)
                 driverObject = driverClass()
-                driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
-                vars(self)[component] = driverObject
+                try :
+                    driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
+                    vars(self)[component] = driverObject
+                except:
+                    self.log.error("Failed to create comonent handle for "+component)
             except(AttributeError):
                 self.log.error("There is no "+driverName+" component driver")
                 self.init_result = self.FAIL
@@ -194,6 +202,7 @@ class OFAutomation:
         result = self.TRUE
         for self.CurrentTestCaseNumber in self.testcases_list:
             self.stepCount = 1
+            self.EXPERIMENTAL_MODE = self.FALSE
             caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
             self.log.exact(caseHeader) 
             caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
@@ -230,21 +239,24 @@ class OFAutomation:
         '''
         #utilities.send_mail()
         result = self.TRUE
+        self.logger.testSummary(self)
+        try :
+            self.reportFile.close()
+            # Closing all the driver's session files
+            for driver in self.driversList:
+                vars(self)[driver].close()
+        except:
+            print " There is an issue with the closing log files"
+        
+        utilities.send_mail()
         try :
             for component in self.componentDictionary.keys():
                 tempObject  = vars(self)[component]    
                 tempObject.exit(tempObject.handle)
                 tempObject.execute(cmd="exit",prompt="(.*)",timeout=120) 
-                
-            self.logger.testSummary(self)
-            self.reportFile.close()
-            # Closing all the driver's session files
-            for driver in self.driversList:
-                vars(self)[driver].close()
-            
-            utilities.send_mail()
+
         except(Exception):
-            print " There is an error with closing hanldes"
+            #print " There is an error with closing hanldes"
             result = self.FALSE
                     
         return result
@@ -256,9 +268,22 @@ class OFAutomation:
            by recursively searching the name of the component.
         '''
         import commands
-        currentDir = os.getcwd()
+        #if main.test_target &&  :
+        #   if 
+            
         cmd = "find "+drivers_path+" -name "+driverName+".py"
         result = commands.getoutput(cmd)
+        
+        result_array = str(result).split('\n')
+        result_count = 0
+        for drivers_list in result_array:
+            #print drivers_list
+            result_count = result_count+1
+        if result_count > 1 :
+            #if main.test_target :
+            print "found "+driverName+" "+ str(result_count) + "  times"+str(result_array)
+            sys.exit()
+            
         result = re.sub("(.*)drivers","",result)
         result = re.sub("\.py","",result)
         result = re.sub("\.pyc","",result)
@@ -365,6 +390,7 @@ class Logger:
         '''
         logmsg = "                               +--------------+\n" +"----------------------------- { Script And Files }  ---------------------------------\n" +"                               +--------------+\n";
         logmsg = logmsg + "\n\tScript Log File : " + main.LogFileName + ""
+        logmsg = logmsg + "\n\Report Log File : " + main.ReportFileName + ""
         logmsg = logmsg + "\n\tTest Script :" + path + "Tests/" + main.TEST + ".py"+ ""
         logmsg = logmsg + "\n\tTest Params : " + path + "Tests/" + main.TEST + ".params" + ""
         logmsg = logmsg + "\n\tTopology : " + path + "Tests/" +main.TEST + ".tpl" + ""
@@ -376,8 +402,24 @@ class Logger:
         logmsg = logmsg + values
         
         logmsg = logmsg + "\n\n                             +-----------------+\n" +"----------------------------- { Components Used }  ---------------------------------\n" +"                             +-----------------+\n"
+        component_list = []
+        component_list.append(None)
+        
+        # Listing the components in the order of test_target component should be first.
         for key in main.componentDictionary.keys():
-            logmsg+="\t"+key+"\n"
+            if main.test_target == key :
+                component_list[0] = key+"-Test Target"
+            else :
+                component_list.append(key)
+                        
+        for index in range(len(component_list)) :
+            if index==0:
+                if component_list[index]:
+                    logmsg+="\t"+component_list[index]+"\n"
+            elif index > 0 :
+                logmsg+="\t"+str(component_list[index])+"\n"
+                
+            
             
         logmsg = logmsg + "\n\n                             +--------------+\n" +"----------------------------- { Topology }  ---------------------------------\n" +"                             +--------------+\n"
         values = "\n\t" + str(main.topology['COMPONENT'])
@@ -392,10 +434,11 @@ class Logger:
         logfile = open(main.LogFileName,"w+")
         logfile.write (logmsg)
         print logmsg
+        main.logHeader = logmsg
         # Adding Header for session logs
-        for driver in main.driversList:
-            vars(main)[driver].write(logmsg)
-        
+        #for driver in main.driversList:
+        #    vars(main)[driver].write(logmsg)
+        component_handle._updateComponentHeaders()
         #self.log.report(logmsg);
         logfile.close()
         
@@ -513,8 +556,15 @@ class Logger:
 
         main.ENDTIME = datetime.datetime.now()
         main.EXECTIME = main.ENDTIME - main.STARTTIME
-        main.TOTAL_TC_SUCCESS = str((main.TOTAL_TC_PASS*100)/main.TOTAL_TC_RUN)
-        main.TOTAL_TC_EXECPERCENT = str((main.TOTAL_TC_RUN*100)/main.TOTAL_TC_PLANNED)
+        if (main.TOTAL_TC_PASS == 0):
+            main.TOTAL_TC_SUCCESS = 0
+        else:
+            main.TOTAL_TC_SUCCESS = str((main.TOTAL_TC_PASS*100)/main.TOTAL_TC_RUN)
+            
+        if (main.TOTAL_TC_RUN == 0) :
+            main.TOTAL_TC_EXECPERCENT = 0
+        else :
+            main.TOTAL_TC_EXECPERCENT = str((main.TOTAL_TC_RUN*100)/main.TOTAL_TC_PLANNED)
         
         testResult = "\n\n ******************************\n" + "\tTest Execution Summary\n" + "\n ******************************\n"
         testResult =  testResult + "\n Test Start           : " + str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S"))
@@ -554,4 +604,6 @@ class Logger:
     
 
 
+def _echo(self):
+    print "THIS IS ECHO"
 

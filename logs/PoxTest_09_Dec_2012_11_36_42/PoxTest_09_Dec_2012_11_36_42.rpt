@@ -2,31 +2,33 @@
 ----------------------------- { Script And Files }  ---------------------------------
                                +--------------+
 
-	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_24_Nov_2012_19_33_07/MininetTest_24_Nov_2012_19_33_07.log
-	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
-	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
-	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_09_Dec_2012_11_36_42/PoxTest_09_Dec_2012_11_36_42.log
+\Report Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_09_Dec_2012_11_36_42/PoxTest_09_Dec_2012_11_36_42.rpt
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.tpl
                              +----------------------+
 ----------------------------- { Script Exec Params }  -------------------------
                              +----------------------+
 
 	
 	'CASE1': 
-	'destination': 'h2'
+	'src': 'h2'
+	 'controller': 'c1'
+	 'destination': 'h2'
+	 'target': 'h3'
 	 'STEP1': 
 	'host': 'h2'
 	
 	
 	 'mail': 'paxweb@paxterrasolutions.com'
-	 'testcases': '[1
-	2]'
-	 'log_dir': '/home/user/Desktop/openflow_logs/'
+	 'testcases': '1'
 	
 
                              +-----------------+
 ----------------------------- { Components Used }  ---------------------------------
                              +-----------------+
-	POX2
+	POX2-Test Target
 	Mininet1
 
 
@@ -36,21 +38,25 @@
 
 	
 	'POX2': 
-	'host': '192.168.56.101'
+	'no-cli': '1'
+	 'host': '192.168.56.101'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'samples.of_tutorial': 
+	
+	
+	 'pox_lib_location': '/home/openflow/pox/'
+	
+	 'test_target': '1'
 	 'password': 'openflow'
 	 'type': 'POX'
-	 'user': 'openflow'
-	 'OPTIONS': 
-	'component': 'samples.of_tutorial'
-	 'log_level': 'DEBUG'
-	
 	
 	 'Mininet1': 
 	'host': '192.168.56.101'
 	 'password': 'openflow'
 	 'type': 'Mininet'
 	 'user': 'openflow'
-	 'OPTIONS': 
+	 'COMPONENTS': 
 	'topo': 'single'
 	 'topocount': '3'
 	 'switch': 'ovsk'
@@ -72,26 +78,18 @@
  Result: Pass 
 ***********************************
 
-*****************************
- Result summary for Testcase2
-*****************************
-
-**********************************
- Result: Pass 
-***********************************
-
 
  ******************************
 	Test Execution Summary
 
  ******************************
 
- Test Start           : 24 Nov 2012 19:33:07
- Test End             : 24 Nov 2012 19:33:17
- Execution Time       : 0:00:10.107500
- Total tests planned  : 2
- Total tests RUN      : 2
- Total Pass           : 2
+ Test Start           : 09 Dec 2012 11:36:42
+ Test End             : 09 Dec 2012 11:36:54
+ Execution Time       : 0:00:12.571101
+ Total tests planned  : 1
+ Total tests RUN      : 1
+ Total Pass           : 1
  Total Fail           : 0
  Total No Result      : 0
  Success Percentage   : 100%
