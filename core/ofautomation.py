@@ -41,6 +41,7 @@ class OFAutomation:
         # Initialization of the variables.
         __builtin__.main = self
         __builtin__.path = path
+        __builtin__.utilities = Utilities()
         self.TRUE = 1
         self.FALSE = 0
         self.ERROR = -1
@@ -52,90 +53,14 @@ class OFAutomation:
         self.stepName =""
         self.EXPERIMENTAL_MODE = False   
         self.test_target = None
+        
         # Parsing of commandline options.
-        optionParser = OptionParser()
-        optionParser.add_option("-t", "--test", dest="testname",
-                  help="test for execution", metavar="")
-        optionParser.add_option("-d", "--testdir", dest="testdir",
-                  help="Tests Directory", metavar="Directory")
-        optionParser.add_option("-l", "--logdir", dest="logdir",
-                  help="Logs Directory", metavar="Directoy")
-        optionParser.add_option("-e", "--example", dest="example",
-                  help="Example Tests Execution", metavar="Option to execute Examples")
-        optionParser.add_option("-c", "--testcases", dest="testcases",
-                  help="Test Cases for execution", metavar="Test Cases for execution")
-        optionParser.add_option("-m", "--mail", dest="mail",
-                  help="mailing list, seperated by comma", metavar="mailing list, seperated by comma")
+        optionParser = parseOptions()
         (options, args) = optionParser.parse_args()
         
-        # Verifying the test or example specified or not.
-        if options.testname:
-            self.TEST = options.testname
-            classPath = "tests."+self.TEST+"."+self.TEST
-            self.tests_path = tests_path
-        elif options.example :
-            self.TEST = options.example
-            self.tests_path = path+"/examples/"
-            classPath = "examples."+self.TEST+"."+self.TEST
-        else :
-            print "Test or Example not specified please specify the --test <test name > or --example <example name>"
-            sys.exit(0)
-        
-        #Verifying Log directory option      
-        if options.logdir:
-            self.logdir = options.logdir
-        else :
-            self.logdir = self.FALSE
-            
-        try :
-            testModule = __import__(classPath, globals(), locals(), [self.TEST], -1)
-        except(ImportError):
-            print "Tere is no test like "+self.TEST
-            sys.exit(0)
-            
-        try :
-            testClass = getattr(testModule, self.TEST)
-        except(AttributeError):
-            print self.TEST+ " module object has no attribute :"+self.TEST
-            sys.exit(0)
- 
-        self.testObject = testClass()
+        # Verifying the commandline options.
+        verifyOptions(options)
 
-        connect_options = {}
-        connect_options['type']='simple'
-        
-        __builtin__.utilities = Utilities()
-        testHandler = TestHandler()
-        self.params = testHandler.parseParams(classPath)
-        try :
-            self.params = self.params['PARAMS']
-        except(KeyError):
-            print "Error with the params file: Either the file not specified or the format is not correct"
-            sys.exit(0)
-            
-        self.topology = testHandler.parseTopology(classPath)
-        try :
-            self.topology = self.topology['TOPOLOGY']
-        except(KeyError):
-            print "Error with the Topology file: Either the file not specified or the format is not correct"
-            sys.exit(0)
-            
-        # Checking the mailing list 
-        if options.mail:
-            self.mail = options.mail
-        elif self.params['mail']:
-            self.mail = self.params['mail']
-        else :
-            self.mail = 'paxweb@paxterrasolutions.com'
-             
-        #Getting Test cases list 
-        if options.testcases:
-            testcases_list = re.sub("(\[|\])", "", options.testcases)
-            self.testcases_list = eval(testcases_list+",")
-        else :
-            self.params['testcases'] = re.sub("(\[|\])", "", self.params['testcases'])
-            self.testcases_list = eval(self.params['testcases']+",")
-            
         self.logger = Logger()
         self.componentDictionary = {}
         self.componentDictionary = self.topology ['COMPONENT']
@@ -154,35 +79,39 @@ class OFAutomation:
         # Creating Drivers Handles
         initString = "\n************************************\n CASE INIT \n*************************************\n"
         self.log.exact(initString)
-        
         self.driverObject = {}
         for component in self.componentDictionary.keys():
-            global driver_options
-            self.log.info("Creating component Handle: "+component)
-            #### R
-             
-            if 'COMPONENTS' in self.componentDictionary[component].keys():
-                driver_options =self.componentDictionary[component]['COMPONENTS']
-            else:
-                driver_options = {}
-                
-            #driver_options = self.componentDictionary[component]['OPTIONS']
-            driverName = self.componentDictionary[component]['type']
+            self.componentInit(component)
             
-            classPath = self.getDriverPath(driverName.lower())
+    def componentInit(self,component):
+        '''
+        This method will initialize specified component
+        '''
+        global driver_options
+        self.log.info("Ceating component Handle: "+component)
+        #### R
+         
+        if 'COMPONENTS' in self.componentDictionary[component].keys():
+            driver_options =self.componentDictionary[component]['COMPONENTS']
+        else:
+            driver_options = {}
+        #driver_options = self.componentDictionary[component]['OPTIONS']
+        driverName = self.componentDictionary[component]['type']
+            
+        classPath = self.getDriverPath(driverName.lower())
+        try :
+            driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
+            driverClass = getattr(driverModule, driverName)
+            driverObject = driverClass()
             try :
-                driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
-                driverClass = getattr(driverModule, driverName)
-                driverObject = driverClass()
-                try :
-                    driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
-                    vars(self)[component] = driverObject
-                except:
-                    self.log.error("Failed to create comonent handle for "+component)
-            except(AttributeError):
-                self.log.error("There is no "+driverName+" component driver")
-                self.init_result = self.FAIL
-                          
+                driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
+                vars(self)[component] = driverObject
+            except:
+                self.log.error("Failed to create comonent handle for "+component)
+        except(AttributeError):
+            self.log.error("There is no "+driverName+" component driver")
+            self.init_result = self.FAIL
+                        
                         
     
     def run(self):
@@ -201,34 +130,42 @@ class OFAutomation:
         self.CASERESULT = self.TRUE
         result = self.TRUE
         for self.CurrentTestCaseNumber in self.testcases_list:
-            self.stepCount = 1
-            self.EXPERIMENTAL_MODE = self.FALSE
-            caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
-            self.log.exact(caseHeader) 
-            caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
-            for driver in self.driversList:
-                vars(self)[driver].write(caseHeader)
+            result = self.runCase(self.CurrentTestCaseNumber)
+        return result
+    
+    def runCase(self,testCaseNumber):
+        self.CurrentTestCaseNumber = testCaseNumber
+        result = self.TRUE
+        self.stepCount = 1
+        self.EXPERIMENTAL_MODE = self.FALSE
+        self.addCaseHeader()
                 
-            try :
-                methodToCall = getattr(self.testObject, "CASE"+str(self.CurrentTestCaseNumber))
-                methodToCall(self)
-                self.testCaseResult[str(self.CurrentTestCaseNumber)] = self.CASERESULT
-                self.logger.updateCaseResults(self)
-            except(AttributeError):
-                self.log.error("CASE "+ str(self.CurrentTestCaseNumber) +" not defined in test script")
-                result = self.FALSE
-                
-                
-                
+        try :
+            methodToCall = getattr(self.testObject, "CASE"+str(self.CurrentTestCaseNumber))
+            methodToCall(self)
+            self.testCaseResult[str(self.CurrentTestCaseNumber)] = self.CASERESULT
+            self.logger.updateCaseResults(self)
+        except(AttributeError):
+            self.log.error("CASE "+ str(self.CurrentTestCaseNumber) +" not defined in test script")
+            result = self.FALSE
+        return result
+    
+    def addCaseHeader(self):
+        caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
+        self.log.exact(caseHeader) 
+        caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
+        for driver in self.driversList:
+            vars(self)[driver].write(caseHeader)
+    
+    def addCaseFooter(self):
+        if self.stepCount-1 > 0 :
             previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
-
             stepHeader = "\n-------------------------------------------------\nEnd of Step "+previousStep+"\n-------------------------------------------------\n"
-            caseFooter = "\n*************************************************\nEnd of Test case "+str(self.CurrentTestCaseNumber)+"\n*************************************************\n"
-            for driver in self.driversList:
-                vars(self)[driver].write(stepHeader+"\n"+caseFooter)
-                
-        return result   
             
+        caseFooter = "\n*************************************************\nEnd of Test case "+str(self.CurrentTestCaseNumber)+"\n*************************************************\n"
+            
+        for driver in self.driversList:
+            vars(self)[driver].write(stepHeader+"\n"+caseFooter)
 
     def cleanup(self):
         '''
@@ -237,9 +174,9 @@ class OFAutomation:
            else return FALSE
 
         '''
-        #utilities.send_mail()
         result = self.TRUE
         self.logger.testSummary(self)
+        
         try :
             self.reportFile.close()
             # Closing all the driver's session files
@@ -252,7 +189,7 @@ class OFAutomation:
         try :
             for component in self.componentDictionary.keys():
                 tempObject  = vars(self)[component]    
-                tempObject.exit(tempObject.handle)
+                tempObject.disconnect(tempObject.handle)
                 tempObject.execute(cmd="exit",prompt="(.*)",timeout=120) 
 
         except(Exception):
@@ -343,6 +280,106 @@ class OFAutomation:
                 counter  = counter + 1
                 self.TOTAL_TC_PLANNED = counter
 
+def parseOptions():
+    '''
+    This will parse the commandline options and retirn the optionParser object.
+    '''
+    optionParser = OptionParser()
+    optionParser.add_option("-t", "--test", dest="testname",
+                 help="test for execution", metavar="")
+    optionParser.add_option("-d", "--testdir", dest="testdir",
+                 help="Tests Directory", metavar="Directory")
+    optionParser.add_option("-l", "--logdir", dest="logdir",
+                 help="Logs Directory", metavar="Directoy")
+    optionParser.add_option("-e", "--example", dest="example",
+                 help="Example Tests Execution", metavar="Option to execute Examples")
+    optionParser.add_option("-c", "--testcases", dest="testcases",
+                 help="Test Cases for execution", metavar="Test Cases for execution")
+    optionParser.add_option("-m", "--mail", dest="mail",
+                 help="mailing list, seperated by comma", metavar="mailing list, seperated by comma")
+    
+    return optionParser
+
+
+def verifyOptions(options):
+    '''
+    This will verify the command line options and set to default values, if any option not given in command line.
+    '''
+    verifyTest(options)
+    verifyTestScript()
+    verifyParams()
+    verifyLogdir(options)
+    verifyMail(options)
+    verifyTestCases(options)
+    
+
+    
+def verifyTest(options):
+    if options.testname:
+        main.TEST = options.testname
+        main.classPath = "tests."+main.TEST+"."+main.TEST
+        main.tests_path = tests_path
+    elif options.example :
+        main.TEST = options.example
+        main.tests_path = path+"/examples/"
+        classPath = "examples."+main.TEST+"."+main.TEST
+    else :
+        print "Test or Example not specified please specify the --test <test name > or --example <example name>"
+        sys.exit(0)
+        
+def verifyLogdir(options):
+    #Verifying Log directory option      
+    if options.logdir:
+        main.logdir = options.logdir
+    else :
+        main.logdir = main.FALSE  
+        
+def verifyMail(options):
+    # Checking the mailing list 
+    if options.mail:
+        main.mail = options.mail
+    elif main.params['mail']:
+        main.mail = main.params['mail']
+    else :
+        main.mail = 'paxweb@paxterrasolutions.com'
+
+def verifyTestCases(options):
+    #Getting Test cases list 
+    if options.testcases:
+        testcases_list = re.sub("(\[|\])", "", options.testcases)
+        main.testcases_list = eval(testcases_list+",")
+    else :
+        main.params['testcases'] = re.sub("(\[|\])", "", main.params['testcases'])
+        main.testcases_list = eval(main.params['testcases']+",") 
+        
+def verifyTestScript():          
+    try :
+        testModule = __import__(main.classPath, globals(), locals(), [main.TEST], -1)
+    except(ImportError):
+        print "There is no test like "+main.TEST
+        sys.exit(0)       
+    try :
+        testClass = getattr(testModule, main.TEST)
+    except(AttributeError):
+        print main.TEST+ " module object has no attribute :"+main.TEST
+        sys.exit(0)
+    main.testObject = testClass()
+    testHandler = TestHandler()
+    main.params = testHandler.parseParams(main.classPath)
+    main.topology = testHandler.parseTopology(main.classPath)
+
+def verifyParams():
+    try :
+        main.params = main.params['PARAMS']
+    except(KeyError):
+        print "Error with the params file: Either the file not specified or the format is not correct"
+        sys.exit(0)            
+    
+    try :
+        main.topology = main.topology['TOPOLOGY']
+    except(KeyError):
+        print "Error with the Topology file: Either the file not specified or the format is not correct"
+        sys.exit(0)            
 
 
 class TestHandler:

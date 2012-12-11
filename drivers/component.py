@@ -37,16 +37,15 @@ class Component(object):
         child = str(child).split()
         child=re.split("(\.)+", child[0])
         child = child[len(child)-1]
-        
         return child
     
-    def execcmd(self,cmd):
-        import commands
-        return commands.getoutput(cmd)
+    def execute(self,cmd):
+        return main.TRUE
+        #import commands
+        #return commands.getoutput(cmd)
         
     def disconnect(self):
-        self.handle = ""
-        return
+        return main.TRUE 
     
     def config(self):
         self = self
@@ -63,7 +62,7 @@ class Component(object):
             vars(main)[driver].write(main.logHeader)
             
         
-    def log_message(self,child):
+    def log(self,child):
         '''
         Here finding the for the component to which the 
         log message based on the called child object.

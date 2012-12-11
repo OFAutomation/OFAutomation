@@ -2,7 +2,8 @@
 ----------------------------- { Script And Files }  ---------------------------------
                                +--------------+
 
-	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_30_Nov_2012_20_24_53/MininetTest_30_Nov_2012_20_24_53.log
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_11_Dec_2012_18_59_35/MininetTest_11_Dec_2012_18_59_35.log
+\Report Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//MininetTest_11_Dec_2012_18_59_35/MininetTest_11_Dec_2012_18_59_35.rpt
 	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.py
 	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.params
 	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/MininetTest.tpl
@@ -17,11 +18,9 @@
 	'host': 'h2'
 	
 	
-	 'mail': 'anilkumar.s@paxterrasolutions.com
-	anil4haart@gmail.com'
+	 'mail': 'anil4haart@gmail.com'
 	 'testcases': '1
 	2'
-	 'log_dir': '/home/user/Desktop/openflow_logs/'
 	
 
                              +-----------------+
@@ -37,21 +36,25 @@
 
 	
 	'POX2': 
-	'host': '192.168.56.101'
+	'no-cli': '1'
+	 'host': '192.168.56.101'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'samples.of_tutorial': 
+	
+	
+	 'pox_lib_location': 'default'
+	
 	 'password': 'openflow'
 	 'type': 'POX'
-	 'user': 'openflow'
-	 'OPTIONS': 
-	'component': 'samples.of_tutorial'
-	 'log_level': 'DEBUG'
-	
+	 'location': 'default'
 	
 	 'Mininet1': 
 	'host': '192.168.56.101'
 	 'password': 'openflow'
 	 'type': 'Mininet'
 	 'user': 'openflow'
-	 'OPTIONS': 
+	 'COMPONENTS': 
 	'topo': 'single'
 	 'topocount': '3'
 	 'switch': 'ovsk'
@@ -77,9 +80,11 @@
  Result summary for Testcase2
 *****************************
 
+[REPORT] [11 Dec 2012 19:04:47] Unable to reach all the hosts
+[REPORT] [11 Dec 2012 19:04:47] Hosts are not reachable
 **********************************
- Result: Pass 
-***********************************
+ Result: Failed 
+**********************************
 
 
  ******************************
@@ -87,13 +92,13 @@
 
  ******************************
 
- Test Start           : 30 Nov 2012 20:24:53
- Test End             : 30 Nov 2012 20:25:04
- Execution Time       : 0:00:11.341385
+ Test Start           : 11 Dec 2012 18:59:35
+ Test End             : 11 Dec 2012 19:04:47
+ Execution Time       : 0:05:11.518152
  Total tests planned  : 2
  Total tests RUN      : 2
- Total Pass           : 2
- Total Fail           : 0
+ Total Pass           : 1
+ Total Fail           : 1
  Total No Result      : 0
- Success Percentage   : 100%
+ Success Percentage   : 50%
  Execution Result     : 100%

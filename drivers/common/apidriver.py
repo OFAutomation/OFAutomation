@@ -2,8 +2,6 @@
 import struct, fcntl, os, sys, signal
 import sys, re
 sys.path.append("../")
-import pydoc
-#pydoc.writedoc('clidriver')
 
 from drivers.component import Component
 class API(Component):
@@ -13,7 +11,7 @@ class API(Component):
     def __init__(self):
         super(Component, self).__init__()
         
-    def connect(self,user_name, ip_address, pwd):
+    def connect(self):
         '''
            Connection will establish to the remote host using ssh.
            It will take user_name ,ip_address and password as arguments<br>

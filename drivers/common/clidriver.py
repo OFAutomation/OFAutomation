@@ -3,8 +3,6 @@ import pexpect
 import struct, fcntl, os, sys, signal
 import sys, re
 sys.path.append("../")
-import pydoc
-#pydoc.writedoc('clidriver')
 
 from drivers.component import Component
 class CLI(Component):
@@ -38,7 +36,7 @@ class CLI(Component):
             
         elif i==2:
             print "I either got key or connection timeout"
-            pass
+            return main.FALSE
         elif i==3: #timeout
             main.log.error("No route to the Host "+user_name+"@"+ip_address)
             return main.FALSE
@@ -51,6 +49,10 @@ class CLI(Component):
         
         return self.handle
     
+    def disconnect(self):
+        result = super(CLI, self).disconnect(self)
+        result = self.execute(cmd="exit",timeout=120,prompt="(.*)")
+    
     
     def execute(self, **execparams):
         '''
@@ -62,6 +64,7 @@ class CLI(Component):
 
         It will return output of command exection.
         '''
+        result = super(CLI, self).execute(self)
         defaultPrompt = '.*[$>\#]'
         args = utilities.parse_args(["CMD", "TIMEOUT", "PROMPT", "MORE"], **execparams)
         expectPrompt = args["PROMPT"] if args["PROMPT"] else defaultPrompt
@@ -113,7 +116,7 @@ class CLI(Component):
             
         return handle
         
-    def log_message(self,message):
+    def log(self,message):
         child = super(CLI, self).log_message(self)
         vars(main)[child].write(message)
     

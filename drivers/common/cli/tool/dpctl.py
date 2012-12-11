@@ -68,9 +68,7 @@ class DPCTL(Tools):
         tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
         command = "dpctl dump-flows tcp:" + str(tcpIP) + ":" + str(tcpPort)
         response = self.execute(cmd=command,prompt="(flow)",timeout=240) 
-        print "#########################"
         print response
-        print "#######################################"
         return response 
 
         return main.TRUE
@@ -80,16 +78,6 @@ class DPCTL(Tools):
          showStatus will provide the Status of given parmetes using "dpctl" 
         '''
         return main.TRUE
-
-    def exit(self,handle):
-        response = ''
-        #if self.handle:
-        #    self.handle = handle
-        #    response = self.execute(cmd="exit",prompt="*** Done",timeout=120)
-        #else :
-        #    main.log.error("Connection failed to the host")
-        #    response = main.FALSE
-        #eturn response  
 
 if __name__ != "__main__":
     import sys

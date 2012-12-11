@@ -108,7 +108,7 @@ class Mininet(Emulator):
             
         return version    
 
-    def exit(self,handle):
+    def disconnect(self,handle):
         response = ''
         if self.handle:
             self.handle = handle

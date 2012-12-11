@@ -4,8 +4,7 @@ import struct, fcntl, os, sys, signal
 import sys
 sys.path.append("../")
 from drivers.common.clidriver import CLI
-import pydoc
-pydoc.writedoc('emulatordriver')
+
 
 class Tools(CLI):
     # The common functions for emulator included in emulatordriver
