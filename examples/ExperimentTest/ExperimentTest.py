@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+''' 
+Created on 26-Nov-2012
+    
+@author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+
+Testing of the Experimental Mode
+'''
 class ExperimentTest:
     '''
     Testing of the Experimental Mode 

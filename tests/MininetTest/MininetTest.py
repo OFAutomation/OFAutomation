@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+'''
+Created on 29-Oct-2012
+
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
+''' 
 class MininetTest:
     '''
     Testing of the some basic Mininet functions included here

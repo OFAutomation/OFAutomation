@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+'''
+Created on 26-Oct-2012
+
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
+
+Mininet is the basic driver which will handle the Mininet functions
+'''  
 import pexpect
 import struct
 import fcntl

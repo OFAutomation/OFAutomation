@@ -1,8 +1,13 @@
 #!/usr/bin/env python
+'''
+Created on 24-Oct-2012
+    
+@authors: Anil Kumar (anilkumar.s@paxterrasolutions.com),
+          Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+          
+'''
 import re
 from logging import Logger
-
-# Need to update the component module with all the required functionalites.
 
 class Component(object):
     '''

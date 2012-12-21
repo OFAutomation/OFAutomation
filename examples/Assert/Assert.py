@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+'''
+Created on 26-Nov-2012
+
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
+'''  
 class Assert:
     '''
     This example shows the usage of the assert

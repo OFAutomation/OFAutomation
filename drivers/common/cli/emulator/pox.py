@@ -1,12 +1,21 @@
 #!/usr/bin/env python
+'''
+Created on 26-Oct-2012
+       
+@author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+
+pox driver provides the basic functions of POX controller
+'''   
 import pexpect
 import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.emulatordriver import Emulator
 
+
 class POX(Emulator):
     '''
         pox driver provides the basic functions of POX controller
+        
     '''
     def __init__(self):
         super(Emulator, self).__init__()

@@ -1,4 +1,11 @@
 #/usr/bin/env python
+'''
+Created on 26-Nov-2012
+       
+@author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+
+DPCTL driver class provides the basic functions of DPCTL controller
+'''
 import pexpect
 import struct, fcntl, os, sys, signal
 import sys

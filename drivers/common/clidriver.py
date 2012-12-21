@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+'''
+Created on 24-Oct-2012
+    
+@authors: Anil Kumar (anilkumar.s@paxterrasolutions.com),
+          Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+          
+'''
 import pexpect
 import struct, fcntl, os, sys, signal
 import sys, re

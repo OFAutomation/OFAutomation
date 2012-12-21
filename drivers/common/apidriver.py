@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+'''
+Created on 22-Nov-2012 
+
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)      
+''' 
+
 import struct, fcntl, os, sys, signal
 import sys, re
 sys.path.append("../")

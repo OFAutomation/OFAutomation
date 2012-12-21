@@ -1,25 +1,27 @@
 #!/usr/bin/env python
+'''
+Created on 23-Oct-2012
+    
+@authors: Anil Kumar (anilkumar.s@paxterrasolutions.com),
+          Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
+          
+Utilities will take care about the basic functions like :
+   * Extended assertion,
+   * parse_args for key-value pair handling
+   * Parsing the params or topology file.
+
+'''
+
 import re
 from configobj import ConfigObj
 import pydoc
 import ast
-# Import smtplib for the actual sending function
 import smtplib
-# For guessing MIME type
 import mimetypes
-# Import the email modules we'll need
 import email
 import os
 import email.mime.application
 
-#pydoc.writedoc('utilities')
-'''
-   Utilities will take care about the basic functions like :
-   * Extended assertion,
-   * parse_args for key-value pair handling
-   * Parsing the params or topology file.
-    
-'''
 class Utilities:
     '''
        Utilities will take care about the basic functions like :

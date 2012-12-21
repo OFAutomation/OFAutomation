@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+'''
+Created on 28-Nov-2012
+
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
+'''  
 class StepParams:
     '''
     This example shows the usage of the STEP level parameters, in params file the

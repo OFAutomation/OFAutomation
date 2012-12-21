@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+'''
+Created on 22-Oct-2012
+    
+@author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
+
+ofautomation is the main module.
+
+'''
 import sys
 import os
 import re
 import __builtin__
-'''
-   ofautomation is the main module.
-'''
+
 global path, drivers_path, core_path, tests_path,logs_path
 
 path = re.sub("(core|bin)$", "", os.getcwd())
@@ -420,6 +426,8 @@ class TestHandler:
 class Logger:
     '''
         Add continuous logs and reports of the test.
+        
+        @author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
     '''
     def _printHeader(self,main) :
         '''
