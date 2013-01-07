@@ -11,12 +11,12 @@ Utilities will take care about the basic functions like :
    * Parsing the params or topology file.
 
 '''
-
 import re
 from configobj import ConfigObj
 import pydoc
 import ast
 import smtplib
+
 import mimetypes
 import email
 import os
@@ -166,8 +166,11 @@ class Utilities:
             main.log.info(arguments["ONPASS"])
         else :
             resultString = str(resultString) + "FAIL"
-            main.log.error(arguments["ONFAIL"])
-            main.log.report(arguments["ONFAIL"])
+            if not isinstance(arguments["ONFAIL"],str):
+                eval(str(arguments["ONFAIL"]))
+            else :
+                main.log.error(arguments["ONFAIL"])
+                main.log.report(arguments["ONFAIL"])
              
         msg = arguments["ON" + str(resultString)]
 
@@ -202,9 +205,12 @@ class Utilities:
     def send_mail(self):
         # Create a text/plain message
         msg = email.mime.Multipart.MIMEMultipart()
-        if main.test_target:
-            sub = "Result summary of \""+main.TEST+"\" run on component \""+main.test_target+"\" Version \""+vars(main)[main.test_target].get_version()+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
-        else :
+        try :
+            if main.test_target:
+                sub = "Result summary of \""+main.TEST+"\" run on component \""+main.test_target+"\" Version \""+vars(main)[main.test_target].get_version()+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
+            else :
+                sub = "Result summary of \""+main.TEST+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
+        except KeyError,AttributeError:
             sub = "Result summary of \""+main.TEST+"\": "+str(main.TOTAL_TC_SUCCESS)+"% Passed"
             
         msg['Subject'] = sub

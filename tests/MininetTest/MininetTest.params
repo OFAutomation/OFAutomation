@@ -1,6 +1,6 @@
 [PARAMS]
     'testcases' = '[1,2]'
-    'mail' = 'anil4haart@gmail.com'
+    'mail' = 'anilkumar.s@paxterrasolutions.com,raghavkashyap@paxterrasolutions.com'
     #'log_dir' = '/home/user/Desktop/openflow_logs/'
     [[CASE1]]
         'destination' = 'h2'

@@ -7,29 +7,36 @@ Created on 22-Oct-2012
 ofautomation is the main module.
 
 '''
+
 import sys
 import os
 import re
 import __builtin__
-
+import new
+import xmldict
+module = new.module("test")
+import openspeak
 global path, drivers_path, core_path, tests_path,logs_path
-
+from logger import Logger
 path = re.sub("(core|bin)$", "", os.getcwd())
 drivers_path = path+"/drivers/"
 core_path = path+"/core"
 tests_path = path+"/tests/"
 logs_path = path+"/logs/"
+config_path = path + "/config/"
 sys.path.append(path)
 sys.path.append( drivers_path)
 sys.path.append(core_path )
 sys.path.append(tests_path)
 
+
+
 from core.utilities import Utilities
-from drivers.component import Component
+
 import logging 
 import datetime
 from optparse import OptionParser
-component_handle = Component()
+
 class OFAutomation:
     '''
     
@@ -39,13 +46,14 @@ class OFAutomation:
     * Create Log file  Handles.
     
     '''
-    def __init__(self):
+    def __init__(self,options):
         '''
            Initialise the component handles specified in the topology file of the specified test.
           
         '''
         # Initialization of the variables.
         __builtin__.main = self
+        
         __builtin__.path = path
         __builtin__.utilities = Utilities()
         self.TRUE = 1
@@ -59,12 +67,14 @@ class OFAutomation:
         self.stepName =""
         self.EXPERIMENTAL_MODE = False   
         self.test_target = None
+        self.lastcommand = None
+        self.testDir = tests_path 
+        self.configFile = config_path + "ofa.cfg" 
+        self.parsingClass = "xmlparser"
+        self.parserPath = core_path + "/xmlparser"
+        self.logs_path = logs_path
         
-        # Parsing of commandline options.
-        optionParser = parseOptions()
-        (options, args) = optionParser.parse_args()
-        
-        # Verifying the commandline options.
+        self.configparser()
         verifyOptions(options)
 
         self.logger = Logger()
@@ -79,7 +89,9 @@ class OFAutomation:
         for component in self.componentDictionary.keys():
             if 'test_target' in self.componentDictionary[component].keys():
                 self.test_target = component
-                 
+             
+        # Checking for the openspeak file and test script 
+            
         self.logger.initlog(self)
 
         # Creating Drivers Handles
@@ -88,19 +100,34 @@ class OFAutomation:
         self.driverObject = {}
         for component in self.componentDictionary.keys():
             self.componentInit(component)
-            
+    
+    def configparser(self):
+        '''
+        It will parse the config file (ofa.cfg) and return as dictionary
+        '''
+        matchFileName = re.match(r'(.*)\.cfg', self.configFile, re.M | re.I)
+        if matchFileName:
+            xml = open(self.configFile).read()
+            try :
+                self.configDict = xmldict.xml_to_dict(xml)
+                return self.configDict
+            except :
+                print "There is no such file to parse " + self.configFile
+                        
     def componentInit(self,component):
         '''
         This method will initialize specified component
         '''
         global driver_options
-        self.log.info("Ceating component Handle: "+component)
+        self.log.info("Creating component Handle: "+component)
         #### R
          
         if 'COMPONENTS' in self.componentDictionary[component].keys():
             driver_options =self.componentDictionary[component]['COMPONENTS']
         else:
             driver_options = {}
+            
+        driver_options['name']=component
         #driver_options = self.componentDictionary[component]['OPTIONS']
         driverName = self.componentDictionary[component]['type']
             
@@ -113,13 +140,12 @@ class OFAutomation:
                 driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
                 vars(self)[component] = driverObject
             except:
-                self.log.error("Failed to create comonent handle for "+component)
+                self.log.error("Failed to create component handle for "+component)
         except(AttributeError):
             self.log.error("There is no "+driverName+" component driver")
             self.init_result = self.FAIL
                         
                         
-    
     def run(self):
         '''
            The Execution of the test script's cases listed in the Test params file will be done here. 
@@ -127,6 +153,7 @@ class OFAutomation:
            This method will return TRUE if it executed all the test cases successfully, 
            else will retun FALSE
         '''
+        
         self.testCaseResult = {}
         self.TOTAL_TC_RUN = 0
         self.TOTAL_TC_NORESULT = 0
@@ -145,15 +172,38 @@ class OFAutomation:
         self.stepCount = 1
         self.EXPERIMENTAL_MODE = self.FALSE
         self.addCaseHeader()
-                
-        try :
-            methodToCall = getattr(self.testObject, "CASE"+str(self.CurrentTestCaseNumber))
-            methodToCall(self)
+        
+        import testparser
+        testCaseNumber = str(testCaseNumber)
+        testFile = self.tests_path + "/"+self.TEST + "/"+self.TEST + ".py"
+        test = testparser.TestParser(testFile)
+        main.testscript = test.testscript
+        code = test.getStepCode()
+        stepCount = 0
+        stopped = False
+        stepList = code[testCaseNumber].keys()
+        self.stepCount = 0
+        while self.stepCount < len(code[testCaseNumber].keys()):
+            if not cli.pause:
+                try :
+                    step = stepList[self.stepCount]
+                    exec code[testCaseNumber][step] in module.__dict__
+                    self.stepCount = self.stepCount + 1
+                except TypeError,e:
+                    self.stepCount = self.stepCount + 1
+                    self.log.error(e)
+            if cli.stop:
+                cli.stop = False
+                stopped = True
+                self.TOTAL_TC_NORESULT = self.TOTAL_TC_NORESULT + 1
+                self.testCaseResult[str(self.CurrentTestCaseNumber)] = "Stopped"
+                self.logger.updateCaseResults(self)
+                result = self.cleanup()
+                break    
+        
+        if not stopped :
             self.testCaseResult[str(self.CurrentTestCaseNumber)] = self.CASERESULT
             self.logger.updateCaseResults(self)
-        except(AttributeError):
-            self.log.error("CASE "+ str(self.CurrentTestCaseNumber) +" not defined in test script")
-            result = self.FALSE
         return result
     
     def addCaseHeader(self):
@@ -204,6 +254,35 @@ class OFAutomation:
                     
         return result
         
+    def pause(self):
+        '''
+        This function will pause the test's execution, and will continue after user provide 'resume' command.
+        '''
+        __builtin__.testthread.pause()
+    
+    def onfail(self,*components):
+        '''
+        When test step failed, calling all the components onfail. 
+        '''
+         
+        if not components:
+            try :
+                for component in self.componentDictionary.keys():
+                    tempObject  = vars(self)[component]
+                    result = tempObject.onfail()
+            except(Exception),e:
+                print str(e)
+                result = self.FALSE
+                
+        else:
+            try :
+                for component in components:
+                    tempObject  = vars(self)[component]
+                    result = tempObject.onfail()
+            except(Exception),e:
+                print str(e)
+                result = self.FALSE
+    
     
     def getDriverPath(self,driverName):
         '''
@@ -219,13 +298,14 @@ class OFAutomation:
         
         result_array = str(result).split('\n')
         result_count = 0
+        
         for drivers_list in result_array:
             #print drivers_list
             result_count = result_count+1
         if result_count > 1 :
             #if main.test_target :
             print "found "+driverName+" "+ str(result_count) + "  times"+str(result_array)
-            sys.exit()
+            self.exit()
             
         result = re.sub("(.*)drivers","",result)
         result = re.sub("\.py","",result)
@@ -241,18 +321,21 @@ class OFAutomation:
         '''
         previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
         self.stepName = stepDesc
+        
+            
         stepName = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount)+": "+ str(stepDesc) + ""
+        if self.stepCount == 0:
+            stepName = " INIT : Initializing the test case :"+self.CurrentTestCase
+            
         self.log.step(stepName)
         stepHeader = ""
         if self.stepCount > 1 :
-            stepHeader = "\n-------------------------------------------------\nEnd of Step "+previousStep+"\n-------------------------------------------------\n"
+            stepHeader = "\n"+"-"*45+"\nEnd of Step "+previousStep+"\n"+"-"*45+"\n"
         
-        stepHeader += "\n-------------------------------------------------\nStart of Step"+stepName+"\n-------------------------------------------------\n" 
+        stepHeader += "\n"+"-"*45+"\nStart of Step"+stepName+"\n"+"-"*45+"\n" 
         for driver in self.driversList:
             vars(self)[driver].write(stepHeader)
             
-        self.stepCount = self.stepCount+ 1
-       
     def case(self,testCaseName):
         '''
            Test's each test-case information will append to the logs.
@@ -278,6 +361,7 @@ class OFAutomation:
         testFile = self.tests_path + "/"+self.TEST + "/"+self.TEST + ".py"
         testFileHandler = open(testFile, 'r')
         testFileList = testFileHandler.readlines()
+        testFileHandler.close()
         #self.TOTAL_TC_PLANNED = 0
         counter = 0
         for index in range(len(testFileList)):
@@ -285,41 +369,27 @@ class OFAutomation:
             if lineMatch:
                 counter  = counter + 1
                 self.TOTAL_TC_PLANNED = counter
-
-def parseOptions():
-    '''
-    This will parse the commandline options and retirn the optionParser object.
-    '''
-    optionParser = OptionParser()
-    optionParser.add_option("-t", "--test", dest="testname",
-                 help="test for execution", metavar="")
-    optionParser.add_option("-d", "--testdir", dest="testdir",
-                 help="Tests Directory", metavar="Directory")
-    optionParser.add_option("-l", "--logdir", dest="logdir",
-                 help="Logs Directory", metavar="Directoy")
-    optionParser.add_option("-e", "--example", dest="example",
-                 help="Example Tests Execution", metavar="Option to execute Examples")
-    optionParser.add_option("-c", "--testcases", dest="testcases",
-                 help="Test Cases for execution", metavar="Test Cases for execution")
-    optionParser.add_option("-m", "--mail", dest="mail",
-                 help="mailing list, seperated by comma", metavar="mailing list, seperated by comma")
-    
-    return optionParser
-
+                
+    def exit(self):
+        __builtin__.testthread = None
+        sys.exit()
 
 def verifyOptions(options):
     '''
     This will verify the command line options and set to default values, if any option not given in command line.
     '''
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+
+    #pp.pprint(options)
     verifyTest(options)
-    verifyTestScript()
+    verifyExample(options)
+    verifyTestScript(options)
     verifyParams()
     verifyLogdir(options)
     verifyMail(options)
     verifyTestCases(options)
-    
 
-    
 def verifyTest(options):
     if options.testname:
         main.TEST = options.testname
@@ -328,11 +398,17 @@ def verifyTest(options):
     elif options.example :
         main.TEST = options.example
         main.tests_path = path+"/examples/"
-        classPath = "examples."+main.TEST+"."+main.TEST
+        main.classPath = "examples."+main.TEST+"."+main.TEST
     else :
         print "Test or Example not specified please specify the --test <test name > or --example <example name>"
-        sys.exit(0)
-        
+        self.exit()
+
+def verifyExample(options):
+    if options.example:
+        main.testDir = path+'/examples/'
+        main.tests_path = path+"/examples/"
+        main.classPath = "examples."+main.TEST+"."+main.TEST
+               
 def verifyLogdir(options):
     #Verifying Log directory option      
     if options.logdir:
@@ -344,7 +420,7 @@ def verifyMail(options):
     # Checking the mailing list 
     if options.mail:
         main.mail = options.mail
-    elif main.params['mail']:
+    elif main.params.has_key('mail'):
         main.mail = main.params['mail']
     else :
         main.mail = 'paxweb@paxterrasolutions.com'
@@ -358,296 +434,98 @@ def verifyTestCases(options):
         main.params['testcases'] = re.sub("(\[|\])", "", main.params['testcases'])
         main.testcases_list = eval(main.params['testcases']+",") 
         
-def verifyTestScript():          
+def verifyTestScript(options):
+    '''
+    Verifyies test script.
+    '''
+    main.openspeak = openspeak.OpenSpeak()        
+    openspeakfile = main.testDir+"/" + main.TEST + "/" + main.TEST + ".ospk"
+    print main.testDir
+    testfile = main.testDir+"/" + main.TEST + "/" + main.TEST + ".py"
+    if os.path.exists(openspeakfile) :
+        main.openspeak.compiler(openspeakfile=openspeakfile,writetofile=1)
+    elif os.path.exists(testfile):
+        print ''
+    else:
+        print "\nThere is no :\""+main.TEST+"\" test, Please Provide OpenSpeak Script/ test script"
+        __builtin__.testthread = None
+        main.exit()
+              
     try :
         testModule = __import__(main.classPath, globals(), locals(), [main.TEST], -1)
     except(ImportError):
         print "There is no test like "+main.TEST
-        sys.exit(0)       
-    try :
-        testClass = getattr(testModule, main.TEST)
-    except(AttributeError):
-        print main.TEST+ " module object has no attribute :"+main.TEST
-        sys.exit(0)
+        main.exit()       
+    #try :
+    testClass = getattr(testModule, main.TEST)
+    #except(AttributeError):
+    #   print main.TEST+ " module object has no attribute :"+main.TEST
+    #    main.exit()
     main.testObject = testClass()
-    testHandler = TestHandler()
-    main.params = testHandler.parseParams(main.classPath)
-    main.topology = testHandler.parseTopology(main.classPath)
+    loadParser()
+    #testHandler = TestHandler()
+    main.params = main.parser.parseParams(main.classPath)     #testHandler.parseParams(main.classPath)
+    main.topology = main.parser.parseTopology(main.classPath) #testHandler.parseTopology(main.classPath)
 
 def verifyParams():
     try :
         main.params = main.params['PARAMS']
     except(KeyError):
         print "Error with the params file: Either the file not specified or the format is not correct"
-        sys.exit(0)            
+        main.exit()            
     
     try :
         main.topology = main.topology['TOPOLOGY']
     except(KeyError):
         print "Error with the Topology file: Either the file not specified or the format is not correct"
-        sys.exit(0)            
+        sys.exit(0)
+        
+def loadParser() :
+    '''
+    It facilitates the loading customised parser for topology and params file.
+    It loads parser mentioned in tab named parser of ofa.cfg file.
+    It also loads default xmlparser if no parser have specified in ofa.cfg file.
 
+    '''
+    confighash = main.configDict
+    if 'parser' in confighash['config'] and 'parser_class' in confighash['config']:
+        if confighash['config']['parser'] != None or confighash['config']['parser_class']!= None :
+            if os.path.exists(confighash['config']['parser']) :
+                module = re.sub(r".py\s*$","",confighash['config']['parser'])
+                moduleList = module.split("/")
+                newModule = ".".join([moduleList[len(moduleList) - 2],moduleList[len(moduleList) - 1]])
+                try :
+                    parsingClass = confighash['config']['parser_class']
+                    parsingModule = __import__(newModule, globals(), locals(), [parsingClass], -1)
+                    parsingClass = getattr(parsingModule, parsingClass)
+                    main.parser = parsingClass()
+                    hashobj = main.parser.parseParams(main.classPath)
 
-class TestHandler:
-    '''
-       Manages authoring, parsing and execution of the test. Sub components are
-       Test-Topology parser
-           Module that parses the test from plain English and topology
-           from a specification file and prepares for execution.
-       Test sequencer 
-           Module that executes the tests case by case,
-           step by step adding ability for step by step pause and debug later.
-       Object loader
-           Module that connects and loads all the component connection objects 
-           for access in the test 
-    '''
-    def parseParams(self,paramsPath):
-        '''
-        It will take the params file path and will return the params dictionary
-        '''
-        paramsPath = re.sub("\.","/",paramsPath)
-        paramsPath = re.sub("tests|examples","",paramsPath)
-        #print main.tests_path+"/"+paramsPath+".params"
-        params = utilities.parse(main.tests_path+"/"+paramsPath+".params")
-        paramsAsString = str(params)
-        return eval(paramsAsString) 
-    
-    def parseTopology(self,topologyPath):
-        '''
-        It will take topology file path and will return topology dictionary
-        '''
-        topologyPath = re.sub("\.","/",topologyPath)
-        topologyPath = re.sub("tests|examples","",topologyPath)
-        topology = utilities.parse(main.tests_path+"/"+topologyPath+".topo")
-        topoAsString = str(topology)
-        return eval(topoAsString) 
-        
-
-class Logger:
-    '''
-        Add continuous logs and reports of the test.
-        
-        @author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
-    '''
-    def _printHeader(self,main) :
-        '''
-            Log's header will be append to the Log file
-        '''
-        logmsg = "                               +--------------+\n" +"----------------------------- { Script And Files }  ---------------------------------\n" +"                               +--------------+\n";
-        logmsg = logmsg + "\n\tScript Log File : " + main.LogFileName + ""
-        logmsg = logmsg + "\n\Report Log File : " + main.ReportFileName + ""
-        logmsg = logmsg + "\n\tTest Script :" + path + "Tests/" + main.TEST + ".py"+ ""
-        logmsg = logmsg + "\n\tTest Params : " + path + "Tests/" + main.TEST + ".params" + ""
-        logmsg = logmsg + "\n\tTopology : " + path + "Tests/" +main.TEST + ".tpl" + ""
-        logmsg = logmsg + "\n                             +----------------------+\n" +"----------------------------- { Script Exec Params }  -------------------------\n" +"                             +----------------------+\n";
-        values = "\n\t" + str(main.params)
-        values = re.sub(",", "\n\t", values)
-        values = re.sub("{", "\n\t", values)
-        values = re.sub("}", "\n\t", values)
-        logmsg = logmsg + values
-        
-        logmsg = logmsg + "\n\n                             +-----------------+\n" +"----------------------------- { Components Used }  ---------------------------------\n" +"                             +-----------------+\n"
-        component_list = []
-        component_list.append(None)
-        
-        # Listing the components in the order of test_target component should be first.
-        for key in main.componentDictionary.keys():
-            if main.test_target == key :
-                component_list[0] = key+"-Test Target"
+                except ImportError:
+                    print sys.exc_info()[1]
             else :
-                component_list.append(key)
-                        
-        for index in range(len(component_list)) :
-            if index==0:
-                if component_list[index]:
-                    logmsg+="\t"+component_list[index]+"\n"
-            elif index > 0 :
-                logmsg+="\t"+str(component_list[index])+"\n"
-                
-            
-            
-        logmsg = logmsg + "\n\n                             +--------------+\n" +"----------------------------- { Topology }  ---------------------------------\n" +"                             +--------------+\n"
-        values = "\n\t" + str(main.topology['COMPONENT'])
-        values = re.sub(",", "\n\t", values)
-        values = re.sub("{", "\n\t", values)
-        values = re.sub("}", "\n\t", values)
-        logmsg = logmsg + values
-        
-        logmsg = logmsg + "\n------------------------------------------------------------------------------------------------------------------\n"
-        
-        # enter into log file all headers
-        logfile = open(main.LogFileName,"w+")
-        logfile.write (logmsg)
-        print logmsg
-        main.logHeader = logmsg
-        # Adding Header for session logs
-        #for driver in main.driversList:
-        #    vars(main)[driver].write(logmsg)
-        component_handle._updateComponentHeaders()
-        #self.log.report(logmsg);
-        logfile.close()
-        
-        #enter into report file all headers
-        main.reportFile = open(main.ReportFileName,"w+")
-        main.reportFile.write(logmsg)
-        #reportFile.close()
-        
-    def initlog(self,main):
-        '''
-            Initialise all the log handles.
-        '''
-        main._getTest()
-        main.STARTTIME = datetime.datetime.now() 
+                print "No Such File Exists !!"
+        elif confighash['config']['parser'] == None or confighash['config']['parser_class'] == None :  
+            load_defaultParser() 
+    else:
+        load_defaultParser()
 
-        currentTime = re.sub("-|\s|:|\.", "_", str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S")))
-        if main.logdir:
-            main.logdir = main.logdir+"/" + main.TEST + "_" + currentTime
-        else:
-            main.logdir = logs_path + "/" + main.TEST + "_" + currentTime
-            
-        os.mkdir(main.logdir)
-           
-        main.LogFileName = main.logdir + "/" + main.TEST + "_" +str(currentTime) + ".log"
-        main.ReportFileName = main.logdir + "/" + main.TEST + "_" + str(currentTime) + ".rpt"
-        
-        for component in main.driversList:
-            vars(main)[component] = main.logdir+"/"+component+".session"
-            vars(main)[component] = open(vars(main)[component],"w+")
-        
-        #### Add log-level - Report
-        logging.addLevelName(9, "REPORT")
-        logging.addLevelName(7, "EXACT")
-        logging.addLevelName(10, "CASE")
-        logging.addLevelName(11, "STEP")
-        main.log = logging.getLogger(main.TEST)
-        def report (msg):
-            '''
-                Will append the report message to the logs.
-            '''
-            main.log._log(9,msg,"OpenFlowAutoMattion","OFAutoMation")
-            currentTime = datetime.datetime.now()
-            currentTime = currentTime.strftime("%d %b %Y %H:%M:%S")
-            newmsg = "\n[REPORT] " +"["+ str(currentTime)+"] "+msg
-            print newmsg
-            main.reportFile.write(newmsg)
-            
-        main.log.report = report 
-        
-        def exact (exmsg):
-            '''
-               Will append the raw formatted message to the logs
-            '''
-            main.log._log(7,exmsg,"OpenFlowAutoMattion","OFAutoMation")
-            main.reportFile.write(exmsg)
-            logfile = open(main.LogFileName,"a")
-            logfile.write("\n"+ str(exmsg) +"\n")
-            logfile.close()
-            print exmsg
-            
-        main.log.exact = exact 
+def load_defaultParser():
+    '''
+    It will load the default parser which is xml parser to parse the params and topology file.
+    '''
+    moduleList = main.parserPath.split("/")
+    newModule = ".".join([moduleList[len(moduleList) - 2],moduleList[len(moduleList) - 1]])
+    try :
+        parsingClass = main.parsingClass 
+        parsingModule = __import__(newModule, globals(), locals(), [parsingClass], -1)
+        parsingClass = getattr(parsingModule, parsingClass)
+        main.parser = parsingClass()
+        hashobj = main.parser.parseParams(main.classPath)
+
+    except ImportError:
+        print sys.exc_info()[1]            
        
-        
-        def case(msg):
-            '''
-               Format of the case type log defined here.
-            '''
-            main.log._log(9,msg,"OpenFlowAutoMattion","OFAutoMation")
-            currentTime = datetime.datetime.now()
-            newmsg = "["+str(currentTime)+"] " + "["+main.TEST+"] " + "[CASE] " +msg
-            logfile = open(main.LogFileName,"a")
-            logfile.write("\n"+ str(newmsg) +"\n")
-            logfile.close()
-            #print newmsg
-                        
-        main.log.case = case 
-        
-        def step (msg):
-            '''
-                Format of the step type log defined here.
-            '''
-            main.log._log(9,msg,"OpenFlowAutoMattion","OFAutoMation")
-            currentTime = datetime.datetime.now()
-            newmsg = "["+str(currentTime)+"] " + "["+main.TEST+"] " + "[STEP] " +msg
-            logfile = open(main.LogFileName,"a")
-            logfile.write("\n"+ str(newmsg) +"\n")
-            logfile.close()
-            #print newmsg
-                        
-        main.log.step = step 
-        
-        main.LogFileHandler = logging.FileHandler(main.LogFileName)
-        self._printHeader(main)
-
-        ### initializing logging module and settig log level
-        main.log.setLevel(logging.INFO)
-        main.LogFileHandler.setLevel(logging.INFO)
-       
-        # create console handler with a higher log level
-        main.ConsoleHandler = logging.StreamHandler()
-        main.ConsoleHandler.setLevel(logging.INFO)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        main.ConsoleHandler.setFormatter(formatter)
-        main.LogFileHandler.setFormatter(formatter)
-
-        # add the handlers to logger
-        main.log.addHandler(main.ConsoleHandler)
-        main.log.addHandler(main.LogFileHandler)
-        
-    def testSummary(self,main):
-        '''
-            testSummary will take care about the Summary of test.
-        '''
-
-        main.ENDTIME = datetime.datetime.now()
-        main.EXECTIME = main.ENDTIME - main.STARTTIME
-        if (main.TOTAL_TC_PASS == 0):
-            main.TOTAL_TC_SUCCESS = 0
-        else:
-            main.TOTAL_TC_SUCCESS = str((main.TOTAL_TC_PASS*100)/main.TOTAL_TC_RUN)
-            
-        if (main.TOTAL_TC_RUN == 0) :
-            main.TOTAL_TC_EXECPERCENT = 0
-        else :
-            main.TOTAL_TC_EXECPERCENT = str((main.TOTAL_TC_RUN*100)/main.TOTAL_TC_PLANNED)
-        
-        testResult = "\n\n ******************************\n" + "\tTest Execution Summary\n" + "\n ******************************\n"
-        testResult =  testResult + "\n Test Start           : " + str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S"))
-        testResult =  testResult + "\n Test End             : " + str(main.ENDTIME.strftime("%d %b %Y %H:%M:%S"))
-        testResult =  testResult + "\n Execution Time       : " + str(main.EXECTIME)
-        testResult =  testResult + "\n Total tests planned  : " + str(main.TOTAL_TC_PLANNED)
-        testResult =  testResult + "\n Total tests RUN      : " + str(main.TOTAL_TC_RUN)
-        testResult =  testResult + "\n Total Pass           : " + str(main.TOTAL_TC_PASS)
-        testResult =  testResult + "\n Total Fail           : " + str(main.TOTAL_TC_FAIL)
-        testResult =  testResult + "\n Total No Result      : " + str(main.TOTAL_TC_NORESULT)
-        testResult =  testResult + "\n Success Percentage   : " + str(main.TOTAL_TC_SUCCESS) + "%"
-        testResult =  testResult + "\n Execution Result     : " + str(main.TOTAL_TC_EXECPERCENT) + "%"
-        
-        #main.log.report(testResult)
-        main.testResult = testResult
-        main.log.exact(testResult)
-                
-    def updateCaseResults(self,main):
-        '''
-            Update the case result based on the steps execution and asserting each step in the test-case
-        '''
-        case = str(main.CurrentTestCaseNumber)
-        
-        if main.testCaseResult[case] == 2:
-            main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN + 1
-            main.TOTAL_TC_NORESULT = main.TOTAL_TC_NORESULT + 1
-            main.log.exact("\n**********************************\n Result: No Assertion Called \n**********************************\n")
-        elif main.testCaseResult[case] == 1:
-            main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN  + 1
-            main.TOTAL_TC_PASS =  main.TOTAL_TC_PASS + 1
-            main.log.exact("\n**********************************\n Result: Pass \n***********************************\n")
-        elif main.testCaseResult[case] == 0:
-            main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN  + 1
-            main.TOTAL_TC_FAIL = main.TOTAL_TC_FAIL + 1
-            main.log.exact("\n**********************************\n Result: Failed \n**********************************\n")
-
-    
-
 
 def _echo(self):
     print "THIS IS ECHO"

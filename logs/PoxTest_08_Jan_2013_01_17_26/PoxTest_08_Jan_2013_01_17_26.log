@@ -1,0 +1,155 @@
+                               +--------------+
+----------------------------- { Script And Files }  ---------------------------------
+                               +--------------+
+
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_08_Jan_2013_01_17_26/PoxTest_08_Jan_2013_01_17_26.log
+\Report Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_08_Jan_2013_01_17_26/PoxTest_08_Jan_2013_01_17_26.rpt
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.tpl
+                             +----------------------+
+----------------------------- { Script Exec Params }  -------------------------
+                             +----------------------+
+
+	
+	'CASE1': 
+	'src': 'h2'
+	 'controller': 'c1'
+	 'destination': 'h2'
+	 'target': 'h3'
+	 'STEP1': 
+	'host': 'h2'
+	
+	
+	 'mail': 'anil4haart@gmail.com
+	paxweb@paxterrasolutions.com'
+	 'testcases': '1'
+	
+
+                             +-----------------+
+----------------------------- { Components Used }  ---------------------------------
+                             +-----------------+
+	POX2-Test Target
+	Mininet1
+
+
+                             +--------------+
+----------------------------- { Topology }  ---------------------------------
+                             +--------------+
+
+	
+	'POX2': 
+	'host': '192.168.56.101'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'samples.of_tutorial': None
+	 'pox_lib_location': '/home/openflow/pox/'
+	
+	 'test_target': '1'
+	 'password': 'openflow'
+	 'type': 'POX'
+	
+	 'Mininet1': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'Mininet'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'topo': 'single'
+	 'topocount': '3'
+	 'switch': 'ovsk'
+	 'controller': 'remote'
+	
+	
+	
+------------------------------------------------------------------------------------------------------------------
+
+
+************************************
+ CASE INIT 
+*************************************
+
+2013-01-08 01:17:26,016 - PoxTest - INFO - Creating component Handle: POX2
+2013-01-08 01:17:26,278 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:17:26,758 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:17:30,174 - PoxTest - INFO - Entering into POX hierarchy
+2013-01-08 01:17:30,282 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:30,282 - PoxTest - INFO - launching POX controller with given components
+2013-01-08 01:17:31,026 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:31,126 - PoxTest - INFO - Creating component Handle: Mininet1
+2013-01-08 01:17:31,354 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:17:31,838 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:17:35,294 - PoxTest - INFO - Clearing any residual state or processes
+2013-01-08 01:17:35,395 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:35,395 - PoxTest - INFO - Password providing for running at sudo mode
+2013-01-08 01:17:35,496 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:35,496 - PoxTest - INFO - Launching network using mininet
+2013-01-08 01:17:38,690 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:38,690 - PoxTest - INFO - Network is being launched
+
+
+*****************************
+ Result summary for Testcase1
+*****************************
+
+
+[2013-01-08 01:17:56.550385] [PoxTest] [CASE]  Checking the control flow of POX
+
+[2013-01-08 01:17:56.550584] [PoxTest] [STEP]  INIT : Initializing the test case :Checking the control flow of POX
+
+[2013-01-08 01:17:57.346128] [PoxTest] [STEP]  1.1: Checking the host reachability using pingHost
+2013-01-08 01:17:57,550 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:17:57,551 - PoxTest - INFO - No Packet loss
+2013-01-08 01:17:57,551 - PoxTest - INFO - Assertion Passed
+2013-01-08 01:17:57,552 - PoxTest - INFO - PING SUCCESS WITH NO PACKET LOSS
+2013-01-08 01:17:57,552 - PoxTest - INFO - Verifying the Expected is equal to the actual or not using assert_equal
+2013-01-08 01:17:57,552 - PoxTest - INFO - Ping executed successfully
+2013-01-08 01:17:57,552 - PoxTest - INFO - Assertion Passed
+
+
+**********************************
+ Result: Pass 
+***********************************
+
+
+
+
+ ******************************
+	Test Execution Summary
+
+ ******************************
+
+ Test Start           : 08 Jan 2013 01:17:26
+ Test End             : 08 Jan 2013 01:17:57
+ Execution Time       : 0:00:31.539059
+ Total tests planned  : 1
+ Total tests RUN      : 1
+ Total Pass           : 1
+ Total Fail           : 0
+ Total No Result      : 0
+ Success Percentage   : 100%
+ Execution Result     : 100%
+2013-01-08 01:20:09,702 - PoxTest - INFO - Creating component Handle: POX2
+2013-01-08 01:20:09,934 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:20:10,394 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:20:13,494 - PoxTest - INFO - Entering into POX hierarchy
+2013-01-08 01:20:13,602 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:13,602 - PoxTest - INFO - launching POX controller with given components
+2013-01-08 01:20:14,191 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:14,291 - PoxTest - INFO - Creating component Handle: Mininet1
+2013-01-08 01:20:14,518 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:20:14,998 - PoxTest - INFO - ssh connection asked for password, gave password
+2013-01-08 01:20:18,402 - PoxTest - INFO - Clearing any residual state or processes
+2013-01-08 01:20:18,503 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:18,503 - PoxTest - INFO - Password providing for running at sudo mode
+2013-01-08 01:20:18,604 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:18,604 - PoxTest - INFO - Launching network using mininet
+2013-01-08 01:20:21,962 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:21,962 - PoxTest - INFO - Network is being launched
+2013-01-08 01:20:44,858 - PoxTest - INFO - Expected Prompt Found
+2013-01-08 01:20:44,858 - PoxTest - INFO - No Packet loss
+2013-01-08 01:20:44,858 - PoxTest - INFO - Assertion Passed
+2013-01-08 01:20:44,859 - PoxTest - INFO - PING SUCCESS WITH NO PACKET LOSS
+2013-01-08 01:20:44,859 - PoxTest - INFO - Verifying the Expected is equal to the actual or not using assert_equal
+2013-01-08 01:20:44,859 - PoxTest - INFO - Ping executed successfully
+2013-01-08 01:20:44,859 - PoxTest - INFO - Assertion Passed

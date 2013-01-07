@@ -5,10 +5,14 @@ Created on 26-Nov-2012
 @author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
 
 Testing of the Experimental Mode
+
+ofautomation>run ExperimentTest example 1
+    will execute this example.
 '''
 class ExperimentTest:
     '''
     Testing of the Experimental Mode 
+    
     '''
     
     def __init__(self):

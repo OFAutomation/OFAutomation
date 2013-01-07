@@ -6,14 +6,16 @@ Created on 24-Oct-2012
           Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
           
 '''
+
 import re
 from logging import Logger
+
+# Need to update the component module with all the required functionalites.
 
 class Component(object):
     '''
     This is the tempalte class for components
     '''
-    
     def __init__(self):
         self.default = ''
         self.wrapped = sys.modules[__name__]
@@ -26,16 +28,20 @@ class Component(object):
           It will return the result of the assert_attribute.
         '''
         try:
+            main.lastcommand = name
             return getattr(self.wrapped, name)
         except AttributeError:
-            def experimentHandling(**kwargs):
-                if main.EXPERIMENTAL_MODE == main.TRUE:
-                    result = self.experimentRun(**kwargs)
-                    main.log.info("EXPERIMENTAL MODE. API "+str(name)+" not yet implemented. Returning dummy values")
-                    return result 
-                else:
-                    return main.FALSE
-            return experimentHandling
+            try:
+                def experimentHandling(**kwargs):
+                    if main.EXPERIMENTAL_MODE == main.TRUE:
+                        result = self.experimentRun(**kwargs)
+                        main.log.info("EXPERIMENTAL MODE. API "+str(name)+" not yet implemented. Returning dummy values")
+                        return result 
+                    else:
+                        return main.FALSE
+                return experimentHandling
+            except TypeError,e:
+                main.log.error("Arguments for experimental mode does not have key 'retruns'" + e)
         
         
     def connect(self,child):

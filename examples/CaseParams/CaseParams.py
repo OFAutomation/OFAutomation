@@ -15,14 +15,14 @@ class CaseParams:
     
     
     cd ~/bin/
-    ./launcher --example CaseParams 
+    ofautomation>run CaseParams example 1
        will execute this example.
     '''
     
     def __init__(self):
         self.default = ""
                 
-    def CASE1(self, main):
+    def CASE1(self,main):
         '''
         This test case will showcase usage of CASE level parameters to specify the host as h2
         '''
@@ -30,10 +30,10 @@ class CaseParams:
         main.step("Host IP Checking using checkIP")
         result = main.Mininet1.checkIP(main.params['CASE1']['destination'])
         main.step("Verifying the result")
-        utilities.assert_equals(expect=main.TRUE, actual=result, onpass="Host h2 IP address configured", onfail="Host h2 IP address didn't configured") 
+        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h2 IP address configured",onfail="Host h2 IP address didn't configured") 
         
 
-    def CASE2(self, main):
+    def CASE2(self,main):
         '''
         This test case will showcase usage of CASE level parameters to specify the host as h3
         '''
@@ -41,4 +41,4 @@ class CaseParams:
         main.step("Host IP Checking using checkIP")
         result = main.Mininet1.checkIP(main.params['CASE2']['destination'])
         main.step("Verifying the result")
-        utilities.assert_equals(expect=main.TRUE, actual=result, onpass="Host h3 IP address configured", onfail="Host h3 IP address didn't configured")             
+        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Host h3 IP address configured",onfail="Host h3 IP address didn't configured")             

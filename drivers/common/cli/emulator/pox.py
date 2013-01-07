@@ -5,17 +5,15 @@ Created on 26-Oct-2012
 @author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
 
 pox driver provides the basic functions of POX controller
-'''   
+'''
 import pexpect
 import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.emulatordriver import Emulator
 
-
 class POX(Emulator):
     '''
         pox driver provides the basic functions of POX controller
-        
     '''
     def __init__(self):
         super(Emulator, self).__init__()
@@ -32,14 +30,14 @@ class POX(Emulator):
 
           *** host is here a virtual mahine or system where pox framework hierarchy exists
         '''
-
+        self.name = options['name']
         poxLibPath = 'default'
         copy = super(POX, self).secureCopy(user_name, ip_address,'/home/openflow/pox/pox/core.py', pwd,path+'/lib/pox/')
         self.handle = super(Emulator, self).connect(user_name, ip_address, pwd)
         self.handle.expect("openflow")
         if self.handle:
             command = self.getcmd(options)
-            print command       
+            #print command       
             main.log.info("Entering into POX hierarchy")
             if options['pox_lib_location'] != 'default':
                 self.execute(cmd="cd "+options['pox_lib_location'],prompt="/pox\$",timeout=120)
@@ -52,6 +50,9 @@ class POX(Emulator):
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address)
             main.log.error("Failed to connect to the POX controller")
     
+
+        
+        
     def disconnect(self,handle):
         if self.handle:
             self.execute(cmd="exit()",prompt="/pox\$",timeout=120)

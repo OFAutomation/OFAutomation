@@ -1,21 +1,15 @@
-#!/usr/bin/env python
-'''
-Created on 30-Nov-2012
 
-@author: Raghav Kashyap(raghavkashyap@paxterrasolutions.com)
-'''
-class PoxTest:
-    '''
-    Testing Basic Pox Functionalities
-    '''
-    def __init__(self):
-        self.default = ""
+class PoxTest :
 
-    def CASE1(self,main):
+    def __init__(self) :
+        self.default = ''
+
+    def CASE1(self,main) :
+
         main.case("Checking the control flow of POX")
-        main.step("Checking the host reachability using pingHost ")
-        
-        result = main.Mininet1.pingHost(src=main.params['CASE1']['src'],
-                                        target=main.params['CASE1']['target'],
-                                        controller=main.params['CASE1']['controller'])
-        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Ping executed successfully",onfail="Ping Failed")
+        main.step("Checking the host reachability using pingHost")
+        main.Mininet1.pingHost(src=main.params['CASE1']['src'], target=main.params['CASE1']['target'], controller=main.params['CASE1']['controller'])
+        result = main.last_result
+        utilities.assert_equals(expect=main.TRUE,actual=result,onpass="Ping executed successfully",onfail="Ping failed")
+    
+    

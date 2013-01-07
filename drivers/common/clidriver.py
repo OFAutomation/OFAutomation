@@ -33,16 +33,16 @@ class CLI(Component):
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
         if i==0:    
-            print "I say yes"
+            main.log.info("ssh key confirmation received, send yes")
             self.handle.sendline('yes')
             i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF])
         if i==1:
-            #print "I give password",
+            main.log.info("ssh connection asked for password, gave password")
             self.handle.sendline(pwd)
             self.handle.expect(user_name)
             
         elif i==2:
-            print "I either got key or connection timeout"
+            main.log.error("Connection timeout")
             return main.FALSE
         elif i==3: #timeout
             main.log.error("No route to the Host "+user_name+"@"+ip_address)
@@ -51,9 +51,7 @@ class CLI(Component):
             main.log.error("ssh: connect to host "+ip_address+" port 22: Connection refused")
             return main.FALSE
 
-        self.handle.sendline("\r")
-        #self.handle.logfile = sys.stdout
-        
+        self.handle.sendline("\r")        
         return self.handle
     
     def disconnect(self):
@@ -126,7 +124,13 @@ class CLI(Component):
     def log(self,message):
         child = super(CLI, self).log_message(self)
         vars(main)[child].write(message)
-    
+        
+    def onfail(self):
+        if main.componentDictionary[self.name].has_key('onfail'):
+            commandList = main.componentDictionary[self.name]['onfail'].split(",")
+            for command in commandList :
+                print command
+                response = self.execute(cmd=command,prompt="(.*)",timeout=120)
 
     def secureCopy(self,user_name, ip_address,filepath, pwd,dst_path):
         
@@ -143,16 +147,16 @@ class CLI(Component):
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
         if i==0:    
-            print "I say yes"
+            main.log.info("ssh key confirmation received, send yes")
             self.handle.sendline('yes')
             i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF])
         if i==1:
-            #print "I give password",
+            main.log.info("ssh connection asked for password, gave password")
             self.handle.sendline(pwd)
             #self.handle.expect(user_name)
             
         elif i==2:
-            print "I either got key or connection timeout"
+            main.log.error("Connection timeout")
             pass
         elif i==3: #timeout
             main.log.error("No route to the Host "+user_name+"@"+ip_address)
@@ -162,7 +166,6 @@ class CLI(Component):
             return main.FALSE
 
         self.handle.sendline("\r")
-        #self.handle.logfile = sys.stdout
         
         return self.handle
     

@@ -11,7 +11,6 @@ import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.toolsdriver import Tools
 import pydoc
-#pydoc.writedoc('pox')
 from drivers.common.clidriver import CLI
 import re
 import os
@@ -19,7 +18,7 @@ import sys
 
 class DPCTL(Tools):
     '''
-     pox driver's template class provides the basic functions of POX controller
+     DPCTL driver class provides the basic functions of DPCTL controller
     '''
     def __init__(self):
         super(DPCTL, self).__init__()
@@ -28,12 +27,12 @@ class DPCTL(Tools):
     
     def connect(self,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
+        self.name = options['name']
         self.handle = super(DPCTL, self).connect(user_name, ip_address, pwd)
         if self.handle :
-            main.log.info("Network is launching")
+            main.log.info("Connected to the host")
         else :
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
-            main.log.error("Failed to connect to the Mininet")
 
 
     def addFlow(self,**flowParameters):
@@ -62,8 +61,10 @@ class DPCTL(Tools):
         command = "dpctl show tcp:" + str(tcpIP) + ":" + str(tcpPort)
         response = self.execute(cmd=command,prompt="get_config_reply",timeout=240)
         if utilities.assert_matches(expect='features_reply',actual=response,onpass="Show flow executed",onfail="Show flow execution Failed"):
+            main.last_result = main.TRUE
             return main.TRUE
         else :
+            main.last_result = main.FALSE
             return main.FALSE
 
     def dumpFlow(self,**flowParameters):

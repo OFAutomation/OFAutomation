@@ -10,8 +10,9 @@ import sys
 sys.path.append("../")
 from drivers.common.clidriver import CLI
 
+
 class Tools(CLI):
-    # The common functions for Tools included in toolsdriver
+    # The common functions for emulator included in emulatordriver
     def __init__(self):
         super(CLI, self).__init__()
 

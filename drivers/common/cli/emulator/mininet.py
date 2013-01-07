@@ -5,7 +5,8 @@ Created on 26-Oct-2012
 @author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
 
 Mininet is the basic driver which will handle the Mininet functions
-'''  
+'''
+
 import pexpect
 import struct
 import fcntl
@@ -29,6 +30,7 @@ class Mininet(Emulator):
 
     def connect(self,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
+        self.name = options['name']
         copy = super(Mininet, self).secureCopy(user_name, ip_address,'/home/openflow/mininet/INSTALL', pwd,path+'/lib/Mininet/')
         self.handle = super(Mininet, self).connect(user_name, ip_address, pwd)
         
@@ -43,7 +45,7 @@ class Mininet(Emulator):
             main.log.info("Password providing for running at sudo mode")
             result2 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
             #preparing command to launch mininet
-            main.log.info("Launching netwrok using mininet")   
+            main.log.info("Launching network using mininet")   
             cmdString = "sudo mn --topo "+options['topo']+","+options['topocount']+" --mac --switch "+options['switch']+" --controller "+options['controller']
             result4 = self.execute(cmd=cmdString,timeout=120,prompt="mininet")
             pattern = '[p|P]assword'
@@ -52,7 +54,7 @@ class Mininet(Emulator):
             #    result3 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
             #else:
             #    result3 = result4
-            main.log.info("Network is launching")
+            main.log.info("Network is being launched")
 
         else :
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
@@ -72,6 +74,7 @@ class Mininet(Emulator):
                 return main.FALSE
         else :
             main.log.error("Connection failed to the host") 
+            return main.FALSE
         
     def pingHost(self,**pingParams):
         
@@ -80,9 +83,11 @@ class Mininet(Emulator):
         response = self.execute(cmd=command,prompt="mininet",timeout=120 )
         if utilities.assert_matches(expect='0% packet loss',actual=response,onpass="No Packet loss",onfail="Host is not reachable"):
             main.log.info("PING SUCCESS WITH NO PACKET LOSS")
+            main.last_result = main.TRUE 
             return main.TRUE
         else :
             main.log.error("PACKET LOST, HOST IS NOT REACHABLE")
+            main.last_result = main.FALSE
             return main.FALSE
         
     

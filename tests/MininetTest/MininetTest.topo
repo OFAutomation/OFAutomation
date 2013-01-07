@@ -6,12 +6,14 @@
             'user' = 'openflow'
             'password' = 'openflow'
             'type' = "Mininet"
+            'test_target' = '1'
             [[[["COMPONENTS"]]]]
                 # Specify the Option for mininet
                 'topo' = 'single'
                 'topocount' = '3'
                 'switch' = 'ovsk'
                 'controller' = 'remote'
+
         [[["POX2"]]]
             'host' = '192.168.56.101'
             'user' = 'openflow'
@@ -20,5 +22,5 @@
             'no-cli' = '1' #or '0' if want to run in cli mode
             'location' = 'default' #"/home/openflow/OFAutomation-OFAutomation-0.0.1/lib/pox/"
             [[[["COMPONENTS"]]]]
-                'pox_lib_location' = 'default'
+                'pox_lib_location' = "/home/openflow/pox/"
                 [[[[["samples.of_tutorial"]]]]]

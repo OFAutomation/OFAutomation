@@ -1,0 +1,102 @@
+                               +--------------+
+----------------------------- { Script And Files }  ---------------------------------
+                               +--------------+
+
+	Script Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_24_Dec_2012_18_04_41/PoxTest_24_Dec_2012_18_04_41.log
+\Report Log File : /home/paxterra/Documents/AptanaWorkspace/OFAutomation//logs//PoxTest_24_Dec_2012_18_04_41/PoxTest_24_Dec_2012_18_04_41.rpt
+	Test Script :/home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.py
+	Test Params : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.params
+	Topology : /home/paxterra/Documents/AptanaWorkspace/OFAutomation/Tests/PoxTest.tpl
+                             +----------------------+
+----------------------------- { Script Exec Params }  -------------------------
+                             +----------------------+
+
+	
+	'CASE1': 
+	'src': 'h2'
+	 'controller': 'c1'
+	 'destination': 'h2'
+	 'target': 'h3'
+	 'STEP1': 
+	'host': 'h2'
+	
+	
+	 'mail': 'paxweb@paxterrasolutions.com'
+	 'testcases': '1'
+	
+
+                             +-----------------+
+----------------------------- { Components Used }  ---------------------------------
+                             +-----------------+
+	POX2-Test Target
+	Mininet1
+
+
+                             +--------------+
+----------------------------- { Topology }  ---------------------------------
+                             +--------------+
+
+	
+	'POX2': 
+	'no-cli': '1'
+	 'host': '192.168.56.101'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'samples.of_tutorial': 
+	
+	
+	 'pox_lib_location': '/home/openflow/pox/'
+	
+	 'test_target': '1'
+	 'password': 'openflow'
+	 'type': 'POX'
+	
+	 'Mininet1': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'Mininet'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'topo': 'single'
+	 'topocount': '3'
+	 'switch': 'ovsk'
+	 'controller': 'remote'
+	
+	
+	
+------------------------------------------------------------------------------------------------------------------
+openflow@192.168.56.101's password: openflow
+
+Welcome to Ubuntu 11.10 (GNU/Linux 3.0.0-12-server x86_64)
+
+ * Documentation:  https://help.ubuntu.com/11.10/serverguide/C
+
+  System information as of Mon Dec 24 13:34:42 CET 2012
+
+  System load:  0.09              Processes:           74
+  Usage of /:   61.2% of 5.90GB   Users logged in:     1
+  Memory usage: 8%                IP address for eth0: 10.0.2.15
+  Swap usage:   0%                IP address for eth1: 192.168.56.101
+
+  Graph this data and manage this system at https://landscape.canonical.com/
+New release '12.04 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+Last login: Mon Dec 24 13:31:19 2012 from 192.168.56.1
+]0;openflow@ETH-Tutorial: ~openflow@ETH-Tutorial:~$ 
+cd /home/openflow/pox/
+
+]0;openflow@ETH-Tutorial: ~openflow@ETH-Tutorial:~$ 
+]0;openflow@ETH-Tutorial: ~openflow@ETH-Tutorial:~$ cd /home/openflow/pox/
+]0;openflow@ETH-Tutorial: ~/poxopenflow@ETH-Tutorial:~/pox$ ./pox.py samples.of_tutorial
+./pox.py samples.of_tutorial
+POX 0.0.0 / Copyright 2011 James McCauley
+DEBUG:core:POX 0.0.0 going up...
+
+*************************************************
+Start of Test Case1 :  Checking the control flow of POX
+*************************************************
+
+-------------------------------------------------
+Start of Step 1.1: Checking the host reachability using pingHost 
+-------------------------------------------------

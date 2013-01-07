@@ -12,6 +12,12 @@ aims to provide an automation framework, that is not just exhaustive in
 coverage, but also makes it easy to debug and author scripts. 
 It allows for authoring scripts in plain English and can be run standalone
 from the command line.
+-----
+Note:
+-----
+
+Please change the params parser file path and Parser name in ~/config/ofa.cfg 
+
 
 ------------
 Test Launch
@@ -31,7 +37,8 @@ In order to run OFAutomation, you must have:
 * Finally ,launching of test must be from "bin" directory which
   resides into "OFAutomation-master" directory as following:
 
-openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./launcher.py --test MininetTest
+openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./cli.py 
+ofautomation>run MininetTest 
 
 --------
 Examples
@@ -42,7 +49,8 @@ Please find the below link for examples:
 
 To launch the example give option as --example:
 
-openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./launcher.py --example CaseParams   
+openflow@ETH-Tutorial:~/OFAutomation-master/bin$ ./cli.py 
+ofautomation>run CaseParams example 1   
      
      
 
