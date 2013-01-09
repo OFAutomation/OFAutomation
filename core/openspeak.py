@@ -507,7 +507,8 @@ class OpenSpeak:
         if args["ARGUMENTS"] == None or args["ARGUMENTS"] == '' :
             subString = ''
         elif argsMatch :
-            argsList = args["ARGUMENTS"].split(",")
+            
+            argsList = line.split(",")
             for index, arguments in enumerate(argsList):
                 argMatch = re.search("(.*)\s+AS\s+(.*)",arguments,flags=0)
                 if argMatch:

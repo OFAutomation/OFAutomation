@@ -42,7 +42,7 @@ class iniparser:
         '''
         It will take the params file path and will return the params dictionary
         '''
-        print "PPPPP" * 20
+
         paramsPath = re.sub("\.","/",paramsPath)
         paramsPath = re.sub("tests|examples","",paramsPath)
         #print main.tests_path+"/"+paramsPath+".params"

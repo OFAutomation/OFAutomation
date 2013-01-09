@@ -37,11 +37,12 @@ class Logger:
         component_list.append(None)
         
         # Listing the components in the order of test_target component should be first.
-        for key in main.componentDictionary.keys():
-            if main.test_target == key :
-                component_list[0] = key+"-Test Target"
-            else :
-                component_list.append(key)
+        if type(main.componentDictionary) == dict:
+            for key in main.componentDictionary.keys():
+                if main.test_target == key :
+                    component_list[0] = key+"-Test Target"
+                else :
+                    component_list.append(key)
                         
         for index in range(len(component_list)) :
             if index==0:

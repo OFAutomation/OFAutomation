@@ -17,7 +17,6 @@ import xmldict
 module = new.module("test")
 import openspeak
 global path, drivers_path, core_path, tests_path,logs_path
-from logger import Logger
 path = re.sub("(core|bin)$", "", os.getcwd())
 drivers_path = path+"/drivers/"
 core_path = path+"/core"
@@ -72,23 +71,26 @@ class OFAutomation:
         self.configFile = config_path + "ofa.cfg" 
         self.parsingClass = "xmlparser"
         self.parserPath = core_path + "/xmlparser"
+        self.loggerPath = core_path + "/logger"
+        self.loggerClass = "Logger"
         self.logs_path = logs_path
         
         self.configparser()
         verifyOptions(options)
-
-        self.logger = Logger()
+        load_logger()
         self.componentDictionary = {}
         self.componentDictionary = self.topology ['COMPONENT']
         self.driversList=[]
+        
         for component in self.componentDictionary :
             self.driversList.append(self.componentDictionary[component]['type'])
             
         self.driversList = list(set(self.driversList)) # Removing duplicates.
         # Checking the test_target option set for the component or not
-        for component in self.componentDictionary.keys():
-            if 'test_target' in self.componentDictionary[component].keys():
-                self.test_target = component
+        if type(self.componentDictionary) == dict:
+            for component in self.componentDictionary.keys():
+                if 'test_target' in self.componentDictionary[component].keys():
+                    self.test_target = component
              
         # Checking for the openspeak file and test script 
             
@@ -98,8 +100,9 @@ class OFAutomation:
         initString = "\n************************************\n CASE INIT \n*************************************\n"
         self.log.exact(initString)
         self.driverObject = {}
-        for component in self.componentDictionary.keys():
-            self.componentInit(component)
+        if type(self.componentDictionary) == dict:
+            for component in self.componentDictionary.keys():
+                self.componentInit(component)
     
     def configparser(self):
         '''
@@ -121,12 +124,10 @@ class OFAutomation:
         global driver_options
         self.log.info("Creating component Handle: "+component)
         #### R
-         
+        driver_options = {}         
         if 'COMPONENTS' in self.componentDictionary[component].keys():
-            driver_options =self.componentDictionary[component]['COMPONENTS']
-        else:
-            driver_options = {}
-            
+            driver_options =dict(self.componentDictionary[component]['COMPONENTS'])
+
         driver_options['name']=component
         #driver_options = self.componentDictionary[component]['OPTIONS']
         driverName = self.componentDictionary[component]['type']
@@ -440,7 +441,6 @@ def verifyTestScript(options):
     '''
     main.openspeak = openspeak.OpenSpeak()        
     openspeakfile = main.testDir+"/" + main.TEST + "/" + main.TEST + ".ospk"
-    print main.testDir
     testfile = main.testDir+"/" + main.TEST + "/" + main.TEST + ".py"
     if os.path.exists(openspeakfile) :
         main.openspeak.compiler(openspeakfile=openspeakfile,writetofile=1)
@@ -462,7 +462,7 @@ def verifyTestScript(options):
     #   print main.TEST+ " module object has no attribute :"+main.TEST
     #    main.exit()
     main.testObject = testClass()
-    loadParser()
+    load_parser()
     #testHandler = TestHandler()
     main.params = main.parser.parseParams(main.classPath)     #testHandler.parseParams(main.classPath)
     main.topology = main.parser.parseTopology(main.classPath) #testHandler.parseTopology(main.classPath)
@@ -478,9 +478,9 @@ def verifyParams():
         main.topology = main.topology['TOPOLOGY']
     except(KeyError):
         print "Error with the Topology file: Either the file not specified or the format is not correct"
-        sys.exit(0)
+        main.exit()
         
-def loadParser() :
+def load_parser() :
     '''
     It facilitates the loading customised parser for topology and params file.
     It loads parser mentioned in tab named parser of ofa.cfg file.
@@ -488,24 +488,32 @@ def loadParser() :
 
     '''
     confighash = main.configDict
-    if 'parser' in confighash['config'] and 'parser_class' in confighash['config']:
-        if confighash['config']['parser'] != None or confighash['config']['parser_class']!= None :
-            if os.path.exists(confighash['config']['parser']) :
-                module = re.sub(r".py\s*$","",confighash['config']['parser'])
+    if 'file' in confighash['config']['parser'] and 'class' in confighash['config']['parser']:
+        if confighash['config']['parser']['file'] != None or confighash['config']['parser']['class']!= None :
+            if os.path.exists(confighash['config']['parser']['file']) :
+                module = re.sub(r".py\s*$","",confighash['config']['parser']['file'])
                 moduleList = module.split("/")
                 newModule = ".".join([moduleList[len(moduleList) - 2],moduleList[len(moduleList) - 1]])
                 try :
-                    parsingClass = confighash['config']['parser_class']
+                    parsingClass = confighash['config']['parser']['class']
                     parsingModule = __import__(newModule, globals(), locals(), [parsingClass], -1)
                     parsingClass = getattr(parsingModule, parsingClass)
                     main.parser = parsingClass()
-                    hashobj = main.parser.parseParams(main.classPath)
+                    #hashobj = main.parser.parseParams(main.classPath)
+                    if hasattr(main.parser,"parseParams") and hasattr(main.parser,"parseTopology") and hasattr(main.parser,"parse") :
+                        
+                        pass
+                    else:
+                        
+                        main.exit()
 
                 except ImportError:
                     print sys.exc_info()[1]
+                    main.exit()
             else :
-                print "No Such File Exists !!"
-        elif confighash['config']['parser'] == None or confighash['config']['parser_class'] == None :  
+                print "No Such File Exists !!"+ confighash['config']['parser']['file']
+                main.exit()
+        elif confighash['config']['parser']['file'] == None or confighash['config']['parser']['class'] == None :  
             load_defaultParser() 
     else:
         load_defaultParser()
@@ -521,11 +529,62 @@ def load_defaultParser():
         parsingModule = __import__(newModule, globals(), locals(), [parsingClass], -1)
         parsingClass = getattr(parsingModule, parsingClass)
         main.parser = parsingClass()
-        hashobj = main.parser.parseParams(main.classPath)
+        if hasattr(main.parser,"parseParams") and hasattr(main.parser,"parseTopology") and hasattr(main.parser,"parse") :
+            pass
+        else:
+            main.exit()
+
 
     except ImportError:
-        print sys.exc_info()[1]            
-       
+        print sys.exc_info()[1]
+
+
+def load_logger() :
+    '''
+    It facilitates the loading customised parser for topology and params file.
+    It loads parser mentioned in tab named parser of ofa.cfg file.
+    It also loads default xmlparser if no parser have specified in ofa.cfg file.
+
+    '''
+    confighash = main.configDict
+    if 'file' in confighash['config']['logger'] and 'class' in confighash['config']['logger']:
+        if confighash['config']['logger']['file'] != None or confighash['config']['logger']['class']!= None :
+            if os.path.exists(confighash['config']['logger']['file']) :
+                module = re.sub(r".py\s*$","",confighash['config']['logger']['file'])
+                moduleList = module.split("/")
+                newModule = ".".join([moduleList[len(moduleList) - 2],moduleList[len(moduleList) - 1]])
+                try :
+                    loggerClass = confighash['config']['logger']['class']
+                    loggerModule = __import__(newModule, globals(), locals(), [loggerClass], -1)
+                    loggerClass = getattr(loggerModule, loggerClass)
+                    main.logger = loggerClass()
+                    #hashobj = main.parser.parseParams(main.classPath)
+
+                except ImportError:
+                    print sys.exc_info()[1]
+            else :
+                print "No Such File Exists !!"
+                main.exit()
+        elif confighash['config']['parser']['file'] == None or confighash['config']['parser']['class'] == None :  
+            load_defaultlogger() 
+    else:
+        load_defaultlogger()
+
+def load_defaultlogger():
+    '''
+    It will load the default parser which is xml parser to parse the params and topology file.
+    '''
+    moduleList = main.loggerPath.split("/")
+    newModule = ".".join([moduleList[len(moduleList) - 2],moduleList[len(moduleList) - 1]])
+    try :
+        loggerClass = main.loggerClass 
+        loggerModule = __import__(newModule, globals(), locals(), [loggerClass], -1)
+        loggerClass = getattr(loggerModule, loggerClass)
+        main.logger = loggerClass()
+
+    except ImportError:
+        print sys.exc_info()[1]
+        main.exit()    
 
 def _echo(self):
     print "THIS IS ECHO"

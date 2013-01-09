@@ -20,5 +20,5 @@
             'no-cli' = '1' #or '0' if want to run in cli mode
             'location' = 'default' #"/home/openflow/OFAutomation-OFAutomation-0.0.1/lib/pox/"
             [[[["COMPONENTS"]]]]
-                'pox_lib_location' = 'default'
+                'pox_lib_location' = '/home/openflow/pox/'
                 [[[[["samples.of_tutorial"]]]]]

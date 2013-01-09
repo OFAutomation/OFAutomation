@@ -1,24 +1,29 @@
-[TOPOLOGY]    
+<TOPOLOGY>
 
-    [[COMPONENT]]
-        [[["Mininet1"]]]
-            'host' = '192.168.56.101'
-            'user' = 'openflow'
-            'password' = 'openflow'
-            'type' = "Mininet"
-            [[[["COMPONENTS"]]]]
+    <COMPONENT>
+        <Mininet1>
+            <host>192.168.56.101</host>
+            <user> openflow</user>
+            <password> openflow</password>
+            <type>Mininet</type>
+            <COMPONENTS>
                 # Specify the Option for mininet
-                'topo' = 'single'
-                'topocount' = '3'
-                'switch' = 'ovsk'
-                'controller' = 'remote'
-        [[["POX2"]]]
-            'host' = '192.168.56.101'
-            'user' = 'openflow'
-            'password' = 'openflow'
-            'type' = 'POX'
-            'no-cli' = '1' #or '0' if want to run in cli mode
-            'location' = 'default' #"/home/openflow/OFAutomation-OFAutomation-0.0.1/lib/pox/"
-            [[[["COMPONENTS"]]]]
-                'pox_lib_location' = 'default'
-                [[[[["samples.of_tutorial"]]]]]
+                <topo> single</topo>
+                <topocount>3</topocount>
+                <switch> ovsk </switch>
+                <controller> remote </controller>
+             </COMPONENTS>   
+        </Mininet1>        
+        <POX2>
+            <host> 192.168.56.101 </host>
+            <user>  openflow </user>
+            <password> openflow </password>
+            <type> POX </type>
+            <test_target> 1 </test_target>
+            <COMPONENTS>
+                <pox_lib_location> /home/openflow/pox/  </pox_lib_location>
+                <samples.of_tutorial></samples.of_tutorial>
+            </COMPONENTS>
+        </POX2>
+    </COMPONENT>
+</TOPOLOGY>
