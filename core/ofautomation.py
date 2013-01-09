@@ -511,8 +511,8 @@ def load_parser() :
                     print sys.exc_info()[1]
                     main.exit()
             else :
-                print "No Such File Exists !!"+ confighash['config']['parser']['file']
-                main.exit()
+                print "No Such File Exists !!"+ confighash['config']['parser']['file'] +"using default parser"
+                load_defaultParser() 
         elif confighash['config']['parser']['file'] == None or confighash['config']['parser']['class'] == None :  
             load_defaultParser() 
     else:
@@ -563,8 +563,8 @@ def load_logger() :
                 except ImportError:
                     print sys.exc_info()[1]
             else :
-                print "No Such File Exists !!"
-                main.exit()
+                print "No Such File Exists !!"+confighash['config']['logger']['file']+ "Using default logger"
+                load_defaultlogger()
         elif confighash['config']['parser']['file'] == None or confighash['config']['parser']['class'] == None :  
             load_defaultlogger() 
     else:
