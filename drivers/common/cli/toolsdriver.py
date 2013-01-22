@@ -15,4 +15,3 @@ class Tools(CLI):
     # The common functions for emulator included in emulatordriver
     def __init__(self):
         super(CLI, self).__init__()
-

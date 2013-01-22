@@ -28,11 +28,15 @@ class Mininet(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self,user_name, ip_address, pwd,options):
+    def connect(self, **kwargs):
+        #,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
-        self.name = options['name']
-        copy = super(Mininet, self).secureCopy(user_name, ip_address,'/home/openflow/mininet/INSTALL', pwd,path+'/lib/Mininet/')
-        self.handle = super(Mininet, self).connect(user_name, ip_address, pwd)
+        for key in kwargs:
+            vars(self)[key] = kwargs[key]       
+        
+        self.name = self.options['name']
+        copy = super(Mininet, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/mininet/INSTALL', self.pwd,path+'/lib/Mininet/')
+        self.handle = super(Mininet, self).connect(self.user_name, self.ip_address, self.pwd)
         
         self.ssh_handle = self.handle
         
@@ -46,7 +50,7 @@ class Mininet(Emulator):
             result2 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
             #preparing command to launch mininet
             main.log.info("Launching network using mininet")   
-            cmdString = "sudo mn --topo "+options['topo']+","+options['topocount']+" --mac --switch "+options['switch']+" --controller "+options['controller']
+            cmdString = "sudo mn --topo "+self.options['topo']+","+self.options['topocount']+" --mac --switch "+self.options['switch']+" --controller "+self.options['controller']
             result4 = self.execute(cmd=cmdString,timeout=120,prompt="mininet")
             pattern = '[p|P]assword'
             result3 = ''
@@ -121,6 +125,7 @@ class Mininet(Emulator):
         return version    
 
     def disconnect(self,handle):
+        
         response = ''
         if self.handle:
             self.handle = handle

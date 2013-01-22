@@ -68,9 +68,9 @@ class Logger:
         print logmsg
         main.logHeader = logmsg
 
-        from drivers.component import Component
-        component_handle = Component()
-        component_handle._updateComponentHeaders()
+        #from drivers.component import Component
+        #component_handle = Component()
+        #component_handle._updateComponentHeaders()
         #self.log.report(logmsg);
         logfile.close()
         
@@ -96,11 +96,7 @@ class Logger:
            
         main.LogFileName = main.logdir + "/" + main.TEST + "_" +str(currentTime) + ".log"
         main.ReportFileName = main.logdir + "/" + main.TEST + "_" + str(currentTime) + ".rpt"
-        
-        for component in main.driversList:
-            vars(main)[component] = main.logdir+"/"+component+".session"
-            vars(main)[component] = open(vars(main)[component],"w+")
-        
+                
         #### Add log-level - Report
         logging.addLevelName(9, "REPORT")
         logging.addLevelName(7, "EXACT")
@@ -232,4 +228,3 @@ class Logger:
             main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN  + 1
             main.TOTAL_TC_FAIL = main.TOTAL_TC_FAIL + 1
             main.log.exact("\n**********************************\n Result: Failed \n**********************************\n")
-

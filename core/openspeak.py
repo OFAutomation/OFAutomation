@@ -114,6 +114,7 @@ class OpenSpeak:
         elseloopMatch = re.match("ELSE\s*$",line,flags=0)   
         elifloop = re.match("ELSE\sIF\s+(\w+)\s*(..|\w+)\s*(.*)",line,flags=0)
         forloopMatch = re.match("\s*REPEAT\s+(/d+)\s+TIMES",line,flags=0)
+        experimentalMatch = re.match("EXPERIMENTAL\s+MODE\s+(\w+)",line,flags=0)
         #conjuctionMatch = re.search("(.*)AND(.*)",line,flags=0)
        
         if caseMatch :
@@ -158,7 +159,10 @@ class OpenSpeak:
             operator = ifloop.group(2)
             value = ifloop.group(3)  
             resultString = resultString + indent + "if " + operand + self.translate_if_else_operator(conditionoperator=operator) + value + ":" 
-            self.flag = self.flag + 1  
+            self.flag = self.flag + 1 
+        elif experimentalMatch :
+            resultString = resultString + indent + self.translate_experimental_mode(mode=experimentalMatch.group(1))
+             
         elif elseloopMatch :
             if initialSpaces == self.initSpace or initialSpaces == self.outLoopSpace:
                 resultString = resultString + indent + "else :"
@@ -215,6 +219,22 @@ class OpenSpeak:
         
         return resultString      
   
+    def translate_experimental_mode(self,**modeType):
+        '''
+         This API will translate statment EXPERIMENTAL MODE ON/OFF into python equivalent.
+         It will return the transalted value.
+         '''
+        args = self.parse_args(["MODE"],**modeType)
+        resultString = ''
+        ONmatch = re.match("\s*ON",args["MODE"],flags=0)
+        OFFmatch = re.match("\sOFF",args["MODE"],flags=0)
+
+        if ONmatch :
+            resultString = "main.EXPERIMENTAL_MODE = main.TRUE"
+        elif OFFmatch :
+            resultString = "main.EXPERIMENTAL_MODE = main.FALSE" 
+
+        return resultString
 
     def interpret(self,**interpetParameters):
         '''

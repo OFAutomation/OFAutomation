@@ -25,11 +25,12 @@ class CLI(Component):
            It will take user_name ,ip_address and password as arguments<br>
            and will return the handle. 
         '''
-        child = super(CLI, self).connect(self)
+        connect_result = super(CLI, self).connect()
         ssh_newkey = 'Are you sure you want to continue connecting'
         refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
-        self.handle.logfile = vars(main)[child]
+        self.handle.logfile = self.logfile_handler
+        #self.handle.logfile = vars(main)[self.name+'log']
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
         if i==0:    
@@ -121,15 +122,10 @@ class CLI(Component):
             
         return handle
         
-    def log(self,message):
-        child = super(CLI, self).log_message(self)
-        vars(main)[child].write(message)
-        
     def onfail(self):
         if main.componentDictionary[self.name].has_key('onfail'):
             commandList = main.componentDictionary[self.name]['onfail'].split(",")
             for command in commandList :
-                print command
                 response = self.execute(cmd=command,prompt="(.*)",timeout=120)
 
     def secureCopy(self,user_name, ip_address,filepath, pwd,dst_path):

@@ -20,7 +20,8 @@ class POX(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self,user_name, ip_address, pwd,options):
+    def connect(self, **kwargs):
+        #,user_name, ip_address, pwd,options):
         '''
           this subroutine is to launch pox controller . It must have arguments as : 
           user_name  = host name ,
@@ -30,17 +31,22 @@ class POX(Emulator):
 
           *** host is here a virtual mahine or system where pox framework hierarchy exists
         '''
-        self.name = options['name']
+        
+        for key in kwargs:
+            vars(self)[key] = kwargs[key]       
+        
+        self.name = self.options['name']
+        
         poxLibPath = 'default'
-        copy = super(POX, self).secureCopy(user_name, ip_address,'/home/openflow/pox/pox/core.py', pwd,path+'/lib/pox/')
-        self.handle = super(Emulator, self).connect(user_name, ip_address, pwd)
+        copy = super(POX, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
+        self.handle = super(Emulator, self).connect(self.user_name, self.ip_address, self.pwd)
         self.handle.expect("openflow")
         if self.handle:
-            command = self.getcmd(options)
+            command = self.getcmd(self.options)
             #print command       
             main.log.info("Entering into POX hierarchy")
-            if options['pox_lib_location'] != 'default':
-                self.execute(cmd="cd "+options['pox_lib_location'],prompt="/pox\$",timeout=120)
+            if self.options['pox_lib_location'] != 'default':
+                self.execute(cmd="cd "+self.options['pox_lib_location'],prompt="/pox\$",timeout=120)
             else:    
                 self.execute(cmd="cd ~/OFAutomation-OFAutomation-0.0.1/lib/pox/",prompt="/pox\$",timeout=120)
             ### launching pox with components    

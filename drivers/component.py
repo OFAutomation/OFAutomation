@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 '''
 Created on 24-Oct-2012
     
@@ -19,16 +20,17 @@ class Component(object):
     def __init__(self):
         self.default = ''
         self.wrapped = sys.modules[__name__]
-
-    
+        
+        
+     
     def __getattr__(self, name):
-        '''
+        ''' 
          This will invoke, if the attribute wasn't found the usual ways.
           Here it will look for assert_attribute and will execute when AttributeError occurs.
           It will return the result of the assert_attribute.
         '''
         try:
-            main.lastcommand = name
+             
             return getattr(self.wrapped, name)
         except AttributeError:
             try:
@@ -44,11 +46,24 @@ class Component(object):
                 main.log.error("Arguments for experimental mode does not have key 'retruns'" + e)
         
         
-    def connect(self,child):
-        child = str(child).split()
-        child=re.split("(\.)+", child[0])
-        child = child[len(child)-1]
-        return child
+    def connect(self):
+        
+        vars(main)[self.name+'log'] = logging.getLogger(self.name)
+                    
+        session_file = main.logdir+"/"+self.name+".session"
+        self.log_handler = logging.FileHandler(session_file)
+        self.log_handler.setLevel(logging.DEBUG)
+            
+        vars(main)[self.name+'log'].setLevel(logging.DEBUG)
+        _formatter = logging.Formatter("%(asctime)s  %(name)-10s: %(levelname)-8s: %(message)s")
+        self.log_handler.setFormatter(_formatter)
+        vars(main)[self.name+'log'].addHandler(self.log_handler)
+        # Adding header for the component log     
+        vars(main)[self.name+'log'].info(main.logHeader)
+        # Opening the session log to append command's execution output
+        self.logfile_handler = open(session_file,"a")
+      
+        return "Dummy"
     
     def execute(self,cmd):
         return main.TRUE
@@ -62,27 +77,25 @@ class Component(object):
         self = self
         # Need to update the configuration code
         
-    def _devicelog(self,msg):
-        Logger.info(self, msg)
-    
     def cleanup(self):
         return main.TRUE
     
-    def _updateComponentHeaders(self):
-        for driver in main.driversList:
-            vars(main)[driver].write(main.logHeader)
+    #def _updateComponentHeaders(self):
+    #    for driver in main.componentDictionary.keys():
+    #        vars(main)[driver+'log'].info(main.logHeader)
             
         
-    def log(self,child):
+    def log(self,message):
         '''
         Here finding the for the component to which the 
         log message based on the called child object.
-        Need to update here.
         '''
-        child = str(child).split()
-        child=re.split("(\.)+", child[0])
-        child = child[len(child)-1]
-        return child
+        vars(main)[self.name+'log'].info("\n"+message+"\n")
+        
+    def close_log_handles(self) :
+        vars(main)[self.name+'log'].removeHandler(self.log_handler)
+        if self.logfile_handler:
+            self.logfile_handler.close()
     
     def get_version(self):
         return "Version unknown"

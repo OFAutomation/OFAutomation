@@ -29,8 +29,10 @@ class TestParser:
                 try :
                     while not re.match('^\s*(\'\'\')|^\s*(\"\"\")',testFileList[index],0) :
                         index = index + 1
-                except IndexError:
-                    print 'IndexError'
+                except IndexError,e:
+                    print ''
+                    
+
             # skip empty lines and single line comments 
             elif not re.match('#|^\s*$',testFileList[index],0):
                 self.statementsList.append(testFileList[index])
@@ -54,8 +56,9 @@ class TestParser:
                         else :
                             break
                     index = index - 1
-                except IndexError:
-                    print 'IndexError'
+                except IndexError,e:
+                    #print 'IndexError'
+                    print ''
     
                 self.caseCode [str(m.group(1))] = self.caseBlock
                 #print "Case CODE "+self.caseCode [str(m.group(1))]
@@ -91,8 +94,9 @@ class TestParser:
                         else :
                             break
                     index = index - 1
-                except IndexError:
-                    print 'IndexError'   
+                except IndexError,e:
+                    #print 'IndexError'
+                    print ''
                 stepCode[step] = stepBlock
                 step = step + 1
             index = index + 1

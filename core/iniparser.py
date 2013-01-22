@@ -60,4 +60,3 @@ class iniparser:
         topoAsString = str(topology)
         return eval(topoAsString)
 
-

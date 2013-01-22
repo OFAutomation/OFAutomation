@@ -131,20 +131,25 @@ class OFAutomation:
         driver_options['name']=component
         #driver_options = self.componentDictionary[component]['OPTIONS']
         driverName = self.componentDictionary[component]['type']
-            
+        driver_options ['type'] = driverName
+        
         classPath = self.getDriverPath(driverName.lower())
-        try :
-            driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
-            driverClass = getattr(driverModule, driverName)
-            driverObject = driverClass()
-            try :
-                driverObject.connect(self.componentDictionary[component]['user'],self.componentDictionary[component]['host'],self.componentDictionary[component]['password'],driver_options)
-                vars(self)[component] = driverObject
-            except:
-                self.log.error("Failed to create component handle for "+component)
-        except(AttributeError):
-            self.log.error("There is no "+driverName+" component driver")
-            self.init_result = self.FAIL
+        #try :
+        driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
+        driverClass = getattr(driverModule, driverName)
+        driverObject = driverClass()
+            #try :
+        driverObject.connect(user_name = self.componentDictionary[component]['user'],
+                             ip_address= self.componentDictionary[component]['host'],
+                             pwd = self.componentDictionary[component]['password'],
+                             options = driver_options)
+            
+        vars(self)[component] = driverObject
+            #except:
+            #    self.log.error("Failed to create component handle for "+component)
+        #except(AttributeError):
+        #    self.log.error("There is no "+driverName+" component driver")
+        #    self.init_result = self.FAIL
                         
                         
     def run(self):
@@ -211,8 +216,8 @@ class OFAutomation:
         caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
         self.log.exact(caseHeader) 
         caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
-        for driver in self.driversList:
-            vars(self)[driver].write(caseHeader)
+        for driver in self.componentDictionary.keys():
+            vars(self)[driver+'log'].info(caseHeader)
     
     def addCaseFooter(self):
         if self.stepCount-1 > 0 :
@@ -234,13 +239,13 @@ class OFAutomation:
         result = self.TRUE
         self.logger.testSummary(self)
         
-        try :
-            self.reportFile.close()
+        #try :
+        #    self.reportFile.close()
             # Closing all the driver's session files
-            for driver in self.driversList:
-                vars(self)[driver].close()
-        except:
-            print " There is an issue with the closing log files"
+        for driver in self.componentDictionary.keys():
+           vars(self)[driver].close_log_handles()
+        #except:
+        #    print " There is an issue with the closing log files"
         
         utilities.send_mail()
         try :
@@ -334,8 +339,8 @@ class OFAutomation:
             stepHeader = "\n"+"-"*45+"\nEnd of Step "+previousStep+"\n"+"-"*45+"\n"
         
         stepHeader += "\n"+"-"*45+"\nStart of Step"+stepName+"\n"+"-"*45+"\n" 
-        for driver in self.driversList:
-            vars(self)[driver].write(stepHeader)
+        for driver in self.componentDictionary.keys():
+            vars(self)[driver+'log'].info(stepHeader)
             
     def case(self,testCaseName):
         '''
@@ -345,8 +350,8 @@ class OFAutomation:
         testCaseName = " " + str(testCaseName) + ""
         self.log.case(testCaseName)
         caseHeader = testCaseName+"\n*************************************************\n" 
-        for driver in self.driversList:
-            vars(self)[driver].write(caseHeader)
+        for driver in self.componentDictionary.keys():
+            vars(self)[driver+'log'].info(caseHeader)
         
     def testDesc(self,description):
         '''
@@ -588,4 +593,3 @@ def load_defaultlogger():
 
 def _echo(self):
     print "THIS IS ECHO"
-

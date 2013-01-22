@@ -17,12 +17,12 @@ class API(Component):
     def __init__(self):
         super(Component, self).__init__()
         
-    def connect(self,user_name, ip_address, pwd):
+    def connect(self):
         '''
            Connection will establish to the remote host using ssh.
            It will take user_name ,ip_address and password as arguments<br>
            and will return the handle. 
         '''
-        child = super(API, self).connect(self)
-        main.log.info("Using the "+child+" component under API") 
+        super(API, self).connect(self)
+         
         return main.TRUE       
