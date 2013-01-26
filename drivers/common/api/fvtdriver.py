@@ -6,7 +6,13 @@ Created on 26-Oct-2012
 
 Mininet is the basic driver which will handle the Mininet functions
 '''
+'''
+There are two changes required in flowvisor-test framework :
 
+1. In ~/flowvisortests/tests/templatetest.py line : 15 comment 'basic_logger = None'
+2. In ~/flowvisortests/tests/testutils.py line : 50 specify config file path CONFIG_FILE = "~/flowvisor-test/tests/tests-base.json"
+
+'''
 import pexpect
 import struct
 import fcntl
