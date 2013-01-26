@@ -12,6 +12,6 @@ from drivers.common.clidriver import CLI
 
 
 class Tools(CLI):
-    # The common functions for emulator included in emulatordriver
+    # The common functions for Tools included in toolsdriver
     def __init__(self):
         super(CLI, self).__init__()

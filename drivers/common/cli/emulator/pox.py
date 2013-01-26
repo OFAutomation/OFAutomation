@@ -56,8 +56,6 @@ class POX(Emulator):
             main.log.error("Connection failed to the host"+user_name+"@"+ip_address)
             main.log.error("Failed to connect to the POX controller")
     
-
-        
         
     def disconnect(self,handle):
         if self.handle:

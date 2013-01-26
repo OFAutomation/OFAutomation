@@ -110,8 +110,42 @@ class Mininet(Emulator):
                 return main.FALSE
         else :
             main.log.error("Connection failed to the host") 
+        
+    def dump(self,**kwargs):
+        main.log.info("Dump node info")
+        self.execute(cmd = 'dump',prompt = 'mininet>',timeout = 10)
+        return main.TRUE
             
+    def intfs(self,**kwargs):
+        main.log.info("List interfaces")
+        self.execute(cmd = 'intfs',prompt = 'mininet>',timeout = 10)
+        return main.TRUE
+    
+    def net(self,**kwargs):
+        main.log.info("List network connections")
+        self.execute(cmd = 'net',prompt = 'mininet>',timeout = 10)
+    
+    def pingpair(self,**kwargs):
+        main.log.infoe("Ping between first two hosts")
+        self.execute(cmd = 'pingpair',prompt = 'mininet>',timeout = 20)
+        
+        if utilities.assert_matches(expect='0% packet loss',actual=response,onpass="No Packet loss",onfail="Hosts not reachable"):
+            main.log.info("Ping between two hosts SUCCESS")
+            main.last_result = main.TRUE 
+            return main.TRUE
+        else :
+            main.log.error("PACKET LOST, HOSTS NOT REACHABLE")
+            main.last_result = main.FALSE
+            return main.FALSE
+    
+    def dpctl(self,**dpctlargs):
+        
+        for key in kwargs:
+            vars(self)[key] = kwargs[key]
             
+        main.log.info('Run dpctl command on all switches')
+        
+        
     def get_version(self):
         file_input = path+'/lib/Mininet/INSTALL'
         version = super(Mininet, self).get_version()

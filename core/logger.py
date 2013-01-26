@@ -19,20 +19,23 @@ class Logger:
         '''
             Log's header will be append to the Log file
         '''
-        logmsg = "                               +--------------+\n" +"----------------------------- { Script And Files }  ---------------------------------\n" +"                               +--------------+\n";
+        logmsg = "\n"+" " * 32+"+----------------+\n" +"-" * 30+" { Script And Files }  "+"-" * 30+"\n" +" " * 32+"+----------------+\n";
         logmsg = logmsg + "\n\tScript Log File : " + main.LogFileName + ""
-        logmsg = logmsg + "\n\Report Log File : " + main.ReportFileName + ""
+        logmsg = logmsg + "\n\tReport Log File : " + main.ReportFileName + ""
+        for component in main.componentDictionary.keys():
+            logmsg = logmsg + "\n\t"+component+" Session Log : " + main.logdir+"/"+component+".session" + ""
+            
         logmsg = logmsg + "\n\tTest Script :" + path + "Tests/" + main.TEST + ".py"+ ""
         logmsg = logmsg + "\n\tTest Params : " + path + "Tests/" + main.TEST + ".params" + ""
         logmsg = logmsg + "\n\tTopology : " + path + "Tests/" +main.TEST + ".tpl" + ""
-        logmsg = logmsg + "\n                             +----------------------+\n" +"----------------------------- { Script Exec Params }  -------------------------\n" +"                             +----------------------+\n";
+        logmsg = logmsg + "\n"+" " * 30+"+" +"-" * 18+"+" +"\n" +"-" * 27+"  { Script Exec Params }  "+"-" * 27 +"\n" +" " * 30 +"+"+"-" * 18 +"+\n";
         values = "\n\t" + str(main.params)
         values = re.sub(",", "\n\t", values)
         values = re.sub("{", "\n\t", values)
         values = re.sub("}", "\n\t", values)
         logmsg = logmsg + values
         
-        logmsg = logmsg + "\n\n                             +-----------------+\n" +"----------------------------- { Components Used }  ---------------------------------\n" +"                             +-----------------+\n"
+        logmsg = logmsg + "\n\n"+" " * 31+"+---------------+\n" +"-" * 29+" { Components Used }  " +"-" * 29+"\n"+" " * 31+"+---------------+\n"
         component_list = []
         component_list.append(None)
         
@@ -53,14 +56,14 @@ class Logger:
                 
             
             
-        logmsg = logmsg + "\n\n                             +--------------+\n" +"----------------------------- { Topology }  ---------------------------------\n" +"                             +--------------+\n"
+        logmsg = logmsg + "\n\n"+" " * 30+"+--------+\n" +"-" * 28+" { Topology }  "+"-" * 28 +"\n" +" " * 30+"+--------+\n"
         values = "\n\t" + str(main.topology['COMPONENT'])
         values = re.sub(",", "\n\t", values)
         values = re.sub("{", "\n\t", values)
         values = re.sub("}", "\n\t", values)
         logmsg = logmsg + values
         
-        logmsg = logmsg + "\n------------------------------------------------------------------------------------------------------------------\n"
+        logmsg = logmsg + "\n"+"-" * 60+"\n"
         
         # enter into log file all headers
         logfile = open(main.LogFileName,"w+")
@@ -68,16 +71,11 @@ class Logger:
         print logmsg
         main.logHeader = logmsg
 
-        #from drivers.component import Component
-        #component_handle = Component()
-        #component_handle._updateComponentHeaders()
-        #self.log.report(logmsg);
         logfile.close()
         
         #enter into report file all headers
         main.reportFile = open(main.ReportFileName,"w+")
         main.reportFile.write(logmsg)
-        #reportFile.close()
         
     def initlog(self,main):
         '''
@@ -88,9 +86,9 @@ class Logger:
 
         currentTime = re.sub("-|\s|:|\.", "_", str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S")))
         if main.logdir:
-            main.logdir = main.logdir+"/" + main.TEST + "_" + currentTime
+            main.logdir = main.logdir+ "/"+main.TEST + "_" + currentTime
         else:
-            main.logdir = main.logs_path + "/" + main.TEST + "_" + currentTime
+            main.logdir = main.logs_path + main.TEST + "_" + currentTime
             
         os.mkdir(main.logdir)
            
@@ -194,7 +192,7 @@ class Logger:
         else :
             main.TOTAL_TC_EXECPERCENT = str((main.TOTAL_TC_RUN*100)/main.TOTAL_TC_PLANNED)
         
-        testResult = "\n\n ******************************\n" + "\tTest Execution Summary\n" + "\n ******************************\n"
+        testResult = "\n\n"+"*" * 37+"\n" + "\tTest Execution Summary\n" + "\n"+"*" * 37+" \n"
         testResult =  testResult + "\n Test Start           : " + str(main.STARTTIME.strftime("%d %b %Y %H:%M:%S"))
         testResult =  testResult + "\n Test End             : " + str(main.ENDTIME.strftime("%d %b %Y %H:%M:%S"))
         testResult =  testResult + "\n Execution Time       : " + str(main.EXECTIME)
@@ -219,12 +217,12 @@ class Logger:
         if main.testCaseResult[case] == 2:
             main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN + 1
             main.TOTAL_TC_NORESULT = main.TOTAL_TC_NORESULT + 1
-            main.log.exact("\n**********************************\n Result: No Assertion Called \n**********************************\n")
+            main.log.exact("\n "+"*" * 29+"\n" + "\n Result: No Assertion Called \n"+"*" * 29+"\n")
         elif main.testCaseResult[case] == 1:
             main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN  + 1
             main.TOTAL_TC_PASS =  main.TOTAL_TC_PASS + 1
-            main.log.exact("\n**********************************\n Result: Pass \n***********************************\n")
+            main.log.exact("\n"+"*" * 29+"\n Result: Pass \n"+"*" * 29+"\n")
         elif main.testCaseResult[case] == 0:
             main.TOTAL_TC_RUN  = main.TOTAL_TC_RUN  + 1
             main.TOTAL_TC_FAIL = main.TOTAL_TC_FAIL + 1
-            main.log.exact("\n**********************************\n Result: Failed \n**********************************\n")
+            main.log.exact("\n"+"*" * 29+"\n Result: Failed \n"+"*" * 29+"\n")
