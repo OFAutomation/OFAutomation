@@ -18,17 +18,15 @@ module = new.module("test")
 import openspeak
 global path, drivers_path, core_path, tests_path,logs_path
 path = re.sub("(core|bin)$", "", os.getcwd())
-drivers_path = path+"/drivers/"
-core_path = path+"/core"
-tests_path = path+"/tests/"
-logs_path = path+"/logs/"
-config_path = path + "/config/"
+drivers_path = path+"drivers/"
+core_path = path+"core"
+tests_path = path+"tests/"
+logs_path = path+"logs/"
+config_path = path + "config/"
 sys.path.append(path)
 sys.path.append( drivers_path)
 sys.path.append(core_path )
 sys.path.append(tests_path)
-
-
 
 from core.utilities import Utilities
 
@@ -93,11 +91,10 @@ class OFAutomation:
                     self.test_target = component
              
         # Checking for the openspeak file and test script 
-            
         self.logger.initlog(self)
 
         # Creating Drivers Handles
-        initString = "\n************************************\n CASE INIT \n*************************************\n"
+        initString = "\n"+"*" * 30+"\n CASE INIT \n"+"*" * 30+"\n"
         self.log.exact(initString)
         self.driverObject = {}
         if type(self.componentDictionary) == dict:
@@ -123,34 +120,24 @@ class OFAutomation:
         '''
         global driver_options
         self.log.info("Creating component Handle: "+component)
-        #### R
         driver_options = {}         
         if 'COMPONENTS' in self.componentDictionary[component].keys():
             driver_options =dict(self.componentDictionary[component]['COMPONENTS'])
 
         driver_options['name']=component
-        #driver_options = self.componentDictionary[component]['OPTIONS']
         driverName = self.componentDictionary[component]['type']
         driver_options ['type'] = driverName
         
         classPath = self.getDriverPath(driverName.lower())
-        #try :
         driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
         driverClass = getattr(driverModule, driverName)
         driverObject = driverClass()
-            #try :
         driverObject.connect(user_name = self.componentDictionary[component]['user'],
                              ip_address= self.componentDictionary[component]['host'],
                              pwd = self.componentDictionary[component]['password'],
                              options = driver_options)
             
         vars(self)[component] = driverObject
-            #except:
-            #    self.log.error("Failed to create component handle for "+component)
-        #except(AttributeError):
-        #    self.log.error("There is no "+driverName+" component driver")
-        #    self.init_result = self.FAIL
-                        
                         
     def run(self):
         '''
@@ -213,18 +200,18 @@ class OFAutomation:
         return result
     
     def addCaseHeader(self):
-        caseHeader = "\n*****************************\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n*****************************\n"
+        caseHeader = "\n"+"*" * 30+"\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n"+"*" * 30+"\n"
         self.log.exact(caseHeader) 
-        caseHeader = "\n*************************************************\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
+        caseHeader = "\n"+"*" * 40 +"\nStart of Test Case"+str(self.CurrentTestCaseNumber)+" : " 
         for driver in self.componentDictionary.keys():
             vars(self)[driver+'log'].info(caseHeader)
     
     def addCaseFooter(self):
         if self.stepCount-1 > 0 :
             previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
-            stepHeader = "\n-------------------------------------------------\nEnd of Step "+previousStep+"\n-------------------------------------------------\n"
+            stepHeader = "\n"+"*" * 40+"\nEnd of Step "+previousStep+"\n"+"*" * 40+"\n"
             
-        caseFooter = "\n*************************************************\nEnd of Test case "+str(self.CurrentTestCaseNumber)+"\n*************************************************\n"
+        caseFooter = "\n"+"*" * 40+"\nEnd of Test case "+str(self.CurrentTestCaseNumber)+"\n"+"*" * 40+"\n"
             
         for driver in self.driversList:
             vars(self)[driver].write(stepHeader+"\n"+caseFooter)
@@ -239,14 +226,11 @@ class OFAutomation:
         result = self.TRUE
         self.logger.testSummary(self)
         
-        #try :
         self.reportFile.close()
-            # Closing all the driver's session files
+        # Closing all the driver's session files
         for driver in self.componentDictionary.keys():
            vars(self)[driver].close_log_handles()
-        #except:
-        #    print " There is an issue with the closing log files"
-        
+
         utilities.send_mail()
         try :
             for component in self.componentDictionary.keys():
@@ -296,9 +280,7 @@ class OFAutomation:
            by recursively searching the name of the component.
         '''
         import commands
-        #if main.test_target &&  :
-        #   if 
-            
+
         cmd = "find "+drivers_path+" -name "+driverName+".py"
         result = commands.getoutput(cmd)
         
@@ -306,10 +288,8 @@ class OFAutomation:
         result_count = 0
         
         for drivers_list in result_array:
-            #print drivers_list
             result_count = result_count+1
         if result_count > 1 :
-            #if main.test_target :
             print "found "+driverName+" "+ str(result_count) + "  times"+str(result_array)
             self.exit()
             
@@ -327,8 +307,7 @@ class OFAutomation:
         '''
         previousStep = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount-1)+": "+ str(self.stepName) + ""
         self.stepName = stepDesc
-        
-            
+
         stepName = " "+str(self.CurrentTestCaseNumber)+"."+str(self.stepCount)+": "+ str(stepDesc) + ""
         if self.stepCount == 0:
             stepName = " INIT : Initializing the test case :"+self.CurrentTestCase
@@ -349,7 +328,7 @@ class OFAutomation:
         self.CurrentTestCase = testCaseName 
         testCaseName = " " + str(testCaseName) + ""
         self.log.case(testCaseName)
-        caseHeader = testCaseName+"\n*************************************************\n" 
+        caseHeader = testCaseName+"\n"+"*" * 40+"\n" 
         for driver in self.componentDictionary.keys():
             vars(self)[driver+'log'].info(caseHeader)
         
@@ -461,17 +440,13 @@ def verifyTestScript(options):
     except(ImportError):
         print "There is no test like "+main.TEST
         main.exit()       
-    #try :
+
     testClass = getattr(testModule, main.TEST)
-    #except(AttributeError):
-    #   print main.TEST+ " module object has no attribute :"+main.TEST
-    #    main.exit()
     main.testObject = testClass()
     load_parser()
-    #testHandler = TestHandler()
-    main.params = main.parser.parseParams(main.classPath)     #testHandler.parseParams(main.classPath)
-    main.topology = main.parser.parseTopology(main.classPath) #testHandler.parseTopology(main.classPath)
-
+    main.params = main.parser.parseParams(main.classPath)    
+    main.topology = main.parser.parseTopology(main.classPath) 
+    
 def verifyParams():
     try :
         main.params = main.params['PARAMS']
@@ -509,7 +484,6 @@ def load_parser() :
                         
                         pass
                     else:
-                        
                         main.exit()
 
                 except ImportError:
@@ -538,7 +512,6 @@ def load_defaultParser():
             pass
         else:
             main.exit()
-
 
     except ImportError:
         print sys.exc_info()[1]

@@ -30,7 +30,6 @@ class CLI(Component):
         refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
         self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
         self.handle.logfile = self.logfile_handler
-        #self.handle.logfile = vars(main)[self.name+'log']
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
         if i==0:    

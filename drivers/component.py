@@ -11,8 +11,6 @@ Created on 24-Oct-2012
 import re
 from logging import Logger
 
-# Need to update the component module with all the required functionalites.
-
 class Component(object):
     '''
     This is the tempalte class for components
@@ -21,8 +19,6 @@ class Component(object):
         self.default = ''
         self.wrapped = sys.modules[__name__]
         
-        
-     
     def __getattr__(self, name):
         ''' 
          This will invoke, if the attribute wasn't found the usual ways.
@@ -30,7 +26,6 @@ class Component(object):
           It will return the result of the assert_attribute.
         '''
         try:
-             
             return getattr(self.wrapped, name)
         except AttributeError:
             try:
@@ -80,11 +75,6 @@ class Component(object):
     def cleanup(self):
         return main.TRUE
     
-    #def _updateComponentHeaders(self):
-    #    for driver in main.componentDictionary.keys():
-    #        vars(main)[driver+'log'].info(main.logHeader)
-            
-        
     def log(self,message):
         '''
         Here finding the for the component to which the 

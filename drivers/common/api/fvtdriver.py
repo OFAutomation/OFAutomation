@@ -64,15 +64,7 @@ def test_set_init(config):
     global baisc_logger
 
     basic_fv_cmd = config["fv_cmd"]
-    #basic_logger = logging.getLogger("fvtdriver")
-    #logFileHandler = logging.FileHandler(config_default["log_file"])
-    #logFileHandler.setLevel(config_default["dbg_level"])
-    #basic_logger.setLevel(config_default["dbg_level"])
-    #_formatter = logging.Formatter("%(asctime)s  %(name)-10s: %(levelname)-8s: %(message)s")
-    #logFileHandler.setFormatter(_formatter)
-    #basic_logger.addHandler(logFileHandler)
 
-    #basic_logger.info("Initializing test set")
     basic_timeout = config["timeout"]
     basic_port_map = config["port_map"]
     basic_config = config

@@ -29,10 +29,6 @@ def dict_to_xml(dict_xml):
     """
     return _to_xml(dict_xml)
 
-# Functions below this line are implementation details.
-# Unless you are changing code, don't bother reading.
-# The functions above constitute the user interface.
-
 def _to_xml(el):
     """
     Converts `el` to its xml representation.
