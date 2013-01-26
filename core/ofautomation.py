@@ -79,7 +79,9 @@ class OFAutomation:
         self.componentDictionary = {}
         self.componentDictionary = self.topology ['COMPONENT']
         self.driversList=[]
-        
+        if type(self.componentDictionary) == str :
+            self.componentDictionary = dict(self.componentDictionary)
+            
         for component in self.componentDictionary :
             self.driversList.append(self.componentDictionary[component]['type'])
             
