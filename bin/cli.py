@@ -412,8 +412,49 @@ class CLI( threading.Thread,Cmd,object ):
                     break
         except IOError:
             error( 'error reading file %s\n' % args[ 0 ] )
-
-
+    
+    def do_updatedriver(self,line):
+        '''
+         updatedriver will update the given driver name which exists into mentioned config file.
+         It will receive two optional arguments :
+         
+         1. Config File Path 
+         2. Drivers List to be updated.
+        
+         Default : config file = "~/OFAutomation/config/updatedriver" ,
+                   Driver List = all drivers specified in config file .
+        '''
+        args = line.split()
+        config = ''
+        drivers = ''
+        try :
+            for index, option in enumerate(args):
+                if option == 'config':
+                    index = index + 1
+                    config = args[index]
+                elif option == 'drivers' :
+                    index = index + 1 
+                    drivers = args[index]
+        except IndexError:
+            pass        
+        import updatedriver
+        converter = updatedriver.UpdateDriver()
+        
+        if config == '':
+            path = re.sub("(bin)$", "", os.getcwd())
+            config = path + "/config/updatedriver.cfg"
+            configDict = converter.configparser(config)
+            
+        else :
+            converter.configparser(config)
+            configDict = converter.configparser(config)
+           
+            
+        converter.writeDriver(drivers)
+                      
+       
+                     
+        
     def do_time( self, line ):
         "Measure time taken for any command in OFAutomation."
         start = time.time()
