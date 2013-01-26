@@ -30,6 +30,7 @@ import oftest.parse as parse
 import oftest.action as action
 import oftest.error as error
 import socket
+import __builtin__
 
 config_default = {
     "param"              : None,
@@ -64,7 +65,6 @@ def test_set_init(config):
     global baisc_logger
 
     basic_fv_cmd = config["fv_cmd"]
-
     basic_timeout = config["timeout"]
     basic_port_map = config["port_map"]
     basic_config = config
@@ -85,8 +85,8 @@ class FvtDriver(API,templatetest.TemplateTest):
         self.logFileName = main.logdir+"/"+self.name+".session"
         config_default["log_file"] = self.logFileName
         test_set_init(config_default)
-        basic_logger = vars(main)[self.name+'log']
-        basic_logger.info("Calling my test setup")
+        __builtin__.basic_logger = vars(main)[self.name+'log']
+        __builtin__.basic_logger.info("Calling my test setup")
         self.setUp(basic_logger)
 
         (self.fv, self.sv, sv_ret, ctl_ret, sw_ret) = testutils.setUpTestEnv(self, fv_cmd=basic_fv_cmd)
@@ -103,10 +103,19 @@ class FvtDriver(API,templatetest.TemplateTest):
      
     def ofmsgSndCmp(self, snd_list, exp_list, xid_ignore=True, hdr_only=True):
         return testutils.ofmsgSndCmp(self, snd_list, exp_list, xid_ignore, hdr_only)
-
+    
     def disconnect(self,handle):
-        return main.TRUE
-
+        response = ''
+        '''
+        if self.handle:
+            self.handle = handle
+            response = self.execute(cmd="exit",prompt="(.*)",timeout=120)
+        else :
+            main.log.error("Connection failed to the host")
+            response = main.FALSE
+        '''
+        return response  
+    
     def setUp(self,basic_logger):
         self.logger = basic_logger
         #basic_logger.info("** START TEST CASE " + str(self))
@@ -118,11 +127,13 @@ class FvtDriver(API,templatetest.TemplateTest):
         self.sv = None
         self.controllers = []
         self.switches = []
-
+    
     def close_log_handles(self) :
-        '''
+        self.tearDown() 
         vars(main)[self.name+'log'].removeHandler(self.log_handler)
-        if self.logfile_handler:
-            self.logfile_handler.close()
-        '''
+        #if self.logfile_handler:
+        #    self.logfile_handler.close()
+        
         return main.TRUE
+
+    
