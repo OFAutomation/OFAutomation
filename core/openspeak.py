@@ -110,7 +110,7 @@ class OpenSpeak:
         initialSpaces = len(line) -len(line.lstrip())    
         line = re.sub("^\s+","",line) if lineSpace else line      
  
-        #print line
+        
         resultString = None
         resultString = "\n" + " " * 4 if str(inspect.stack()[1][3]) == "compiler" else "\n"
         indent = " " *(4 + 4 * self.flag) if self.flag > 0 else " " * 4         
@@ -155,8 +155,8 @@ class OpenSpeak:
         elif ondoMatch :
             resultString = resultString + indent + self.translate_onDOAs(component=ondoMatch.group(1),action=ondoMatch.group(2))  
         elif storeMatch :
-            resultString = resultString + indent + self.translate_store(variable=storeMatch.group(1),
-                                                                         value=storeMatch.group(2)) 
+            resultString = resultString + indent + self.translate_store(variable=storeMatch.group(2),
+                                                                         value=storeMatch.group(1)) 
         elif variableMatch :
             resultString = resultString + indent + self.translate_store(variable=variableMatch.group(1),
                                                                          value=variableMatch.group(2))
@@ -170,7 +170,7 @@ class OpenSpeak:
             resultString = resultString + indent + self.translate_logs(loglevel=logMatch.group(1),
                                                                         message=logMatch.group(2))
         elif ifloop :
-            #print self.flag
+            
             self.initSpace = initialSpaces 
             operand = ifloop.group(1)
             operator = ifloop.group(2)
@@ -190,7 +190,7 @@ class OpenSpeak:
                 self.flag = self.flag + 1
                    
         elif elifloop :
-            #print self.flag
+            
             operand = elifloop.group(1)
             operator = elifloop.group(2)
             value = elifloop.group(3)  
@@ -359,7 +359,7 @@ class OpenSpeak:
         if args["OPERATOR"] == None or args["OPERATOR"] == "" :
             print "\n Error : Operator has not been specified !!!"
         elif notOperatorMatch or notOperatorSymbMatch:
-            #print "\n Operator with NOT \n"
+            
             operators = notOperatorMatch.group(1) if notOperatorMatch else notOperatorSymbMatch.group(1) 
             operators = self.translate_operator(operator=operators)
             resultString = resultString + "utilities.assert_not_" + operators + "(expect=" +\
@@ -435,7 +435,7 @@ class OpenSpeak:
           It will return the translated assertion operator.
         '''
         args = self.parse_args(["OPERATOR"],**operatorStatement)
-        #print args["OPERATOR"]
+        
         resultString = ''
         equalsMatch = re.match("EQUALS$|=$",args["OPERATOR"],flags=0)
         greaterMatch = re.match("GREATER\s+THAN$|>$",args["OPERATOR"],flags=0)
@@ -444,22 +444,22 @@ class OpenSpeak:
         greaterEqualMatch =  re.match("GREATER\s+THAN\s+OR\s+EQUALS$|>=$",args["OPERATOR"],flags=0)
         lesserEqualMatch = re.match("LESSER\s+THAN\s+OR\s+EQUALS$|<=$",args["OPERATOR"],flags=0)
         if equalsMatch :
-            #print "\n Equals operator" * 3
+            
             resultString = resultString + "equals"
         elif greaterMatch : 
-            #print "\n Greater operator " * 3
+            
             resultString = resultString + "greater"
         elif lesserMatch : 
-            #print "\n Lesser operator " * 3
+            
             resultString = resultString + "lesser"
         elif stringMatch :
-            #print "\n Match operator" * 3
+            
             resultString = resultString + "matches"
         elif greaterEqualMatch:
-            #print "\n Greater Than Equals to " * 3
+            
             resultString = resultString + "greater_equals"
         elif lesserEqualMatch :
-            #print "\n Lesser Than Equals to" * 3
+            
             resultString = resultString + "lesser_equals"
         else :
             print "\n Error: Given Operator is not listed for assertion"  
@@ -473,12 +473,16 @@ class OpenSpeak:
         args = self.parse_args(["VARIABLE","VALUE"],**storeStatement)
         resultString = ''
         # convert the statement here     
+        ondoMatch = re.match("\s*ON\s+(.*)\s+DO\s+(.*)",args["VALUE"],flags=0)
         paramsMatch = re.search("PARAMS\[(.*)\]|STEP\[(.*)\]|TOPO\[(.*)\]|CASE\[(.*)\]|LAST_RESULT|LAST_RESPONSE",args["VALUE"],flags=0)
-        if not paramsMatch :
-            resultString = args["VARIABLE"] + " = " + args["VALUE"]
+        if paramsMatch :
+            argString = self.translate_parameters(parameters=args["VALUE"])
+            resultString = args["VARIABLE"] + " = " + argString
+        elif ondoMatch :
+            resultString = args["VARIABLE"] + " = "  + self.translate_onDOAs(component=ondoMatch.group(1),action=ondoMatch.group(2))
         else :
-             argString = self.translate_parameters(parameters=args["VALUE"])
-             resultString = args["VARIABLE"] + " = " + argString
+            resultString = args["VARIABLE"] + " = " + args["VALUE"]
+
 
         return resultString
    
@@ -504,7 +508,7 @@ class OpenSpeak:
         usingMatch = re.match("\s*(.*)\s+USING\s+(.*)",args["ACTION"],flags=0)
         action = ''
         if usingMatch :
-            print "RR" * 9
+            
             action = usingMatch.group(1)
             arguments = usingMatch.group(2)
             subString = self.translate_usingas(arguments=arguments)
@@ -527,16 +531,15 @@ class OpenSpeak:
         '''
         This will handle the conjuctions
         '''
-        print conjuctStatement
+        
         args = self.parse_args(["STATEMENT"],**conjuctStatement)
         subSentence = ''
-        print "U" * 9  
-        print args
+        
         storeMatch = re.match("\s*STORE\s+(.*)\s+IN\s+(.*)",args["STATEMENT"],flags=0)
         assertMatch = re.match("\s*ASSERT\s+(\w+)\s+(.*)\s+(.*)\s+ONPASS\s+(.*)\s+ONFAIL\s+(.*)",args["STATEMENT"],flags=0)
         if storeMatch :
-            subSentence =  "\n" + " " * 8 + self.translate_store(variable=storeMatch.group(1),
-                                                                         value=storeMatch.group(2))
+            subSentence =  "\n" + " " * 8 + self.translate_store(variable=storeMatch.group(2),
+                                                                         value=storeMatch.group(1))
         elif assertMatch :
             subSentence = "\n" + " " * 8 + self.translate_assertion(leftvalue=assertMatch.group(1),
                                                                     operator=assertMatch.group(2),
@@ -707,7 +710,7 @@ class OpenSpeak:
          to resultString and returns resultString 
         ''' 
         args = self.parse_args(["TESTNAME"],**nameStatement)
-        print ""
+       
         resultString = ''
         resultString = "main.case(\"" + args["TESTNAME"]  + "\")" 
         # convert the statement here     
