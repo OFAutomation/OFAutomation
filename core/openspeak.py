@@ -58,8 +58,7 @@ class OpenSpeak:
                 self.outLoopSpace = initialSpaces  
                 nextLine = openSpeakFile[index+1]
                 nextinitialSpaces = len(nextLine) -len(nextLine.lstrip())
-                #print initialSpaces
-                #print nextinitialSpaces
+                
                     
                 while nextinitialSpaces > initialSpaces :
                     try :
@@ -83,8 +82,7 @@ class OpenSpeak:
                         self.flag = self.flag + 1
                         result =  result + self.verify_and_translate(openSpeakFile[index])
                         index = index + 1
-                        print "REsult " * 9
-                        print result
+                        
                     except IndexError :
                         pass
                     
@@ -141,8 +139,6 @@ class OpenSpeak:
             self.CurrentCase = "CASE" + caseMatch.group(1)
             resultString = resultString + self.translate_case_block(casenumber=caseMatch.group(1))
         elif repeatMatch:
-            print "REPEAT MATCH" * 9
-            print repeatMatch.group(1)
             resultString = resultString + indent + self.translate_repeat(repeat=repeatMatch.group(1))
         elif nameMatch : 
             resultString = resultString +  indent + self.translate_testcase_name(testname=nameMatch.group(1))
@@ -214,8 +210,7 @@ class OpenSpeak:
         '''
         this will transalte the repeat statement into a python equivalen while loop
         '''
-        print "DDD" * 9
-        print repeatStatement
+        
         args = self.parse_args(["REPEAT"],**repeatStatement)
         resultString = ''
         
