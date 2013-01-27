@@ -75,17 +75,149 @@ class DPCTL(Tools):
         tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
         tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
         command = "dpctl dump-flows tcp:" + str(tcpIP) + ":" + str(tcpPort)
-        response = self.execute(cmd=command,prompt="(flow)",timeout=240) 
-        print response
-        return response 
+        response = self.execute(cmd=command,prompt="type=",timeout=240)
+        if utilities.assert_matches(expect='stats_reply',actual=response,onpass="Dump flow executed",onfail="Dump flow execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
 
-        return main.TRUE
-  
+    
+    def dumpTables(self,**flowParameters):
+        '''
+         dumpTables gives statistics for each of the flow tables used by datapath switch.
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        command = "dpctl dump-tables tcp:" + str(tcpIP) + ":" + str(tcpPort)
+        response = self.execute(cmd=command,prompt="matched",timeout=240)
+        if utilities.assert_matches(expect='lookup=3',actual=response,onpass="Dump Tables executed",onfail="Dump Tables execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+         
+    def dumpPorts(self,**flowParameters):
+        '''
+         dumpPorts gives ports information
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        command = "dpctl dump-ports tcp:" + str(tcpIP) + ":" + str(tcpPort)
+        response = self.execute(cmd=command,prompt="rx pkts",timeout=240)
+        if utilities.assert_matches(expect='ports',actual=response,onpass="Dump Ports executed",onfail="Dump Ports execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
+
+    def dumpAggregate(self,**flowParameters):
+        '''
+         dumpAggregate  gives installed flow information.ggregate statistics for flows in datapath WITCH's tables that match flows.
+         If flows is omitted, the statistics are aggregated across all flows in the datapath's flow tables
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT","FLOW"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        flow = args["FLOW"] if args["FLOW"] != None else ""
+        command = "dpctl dump-aggregate tcp:" + str(tcpIP) + ":" + str(tcpPort) + " " + str (flow)
+        response = self.execute(cmd=command,prompt="flow_count=",timeout=240)
+        if utilities.assert_matches(expect='stats_reply',actual=response,onpass="Dump Aggregate executed",onfail="Dump Aggregate execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
+    def delFlow(self,**flowParameters):
+        '''
+         delFlow Deletes entries from the datapath switch's tables that match flow
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT","FLOW"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        flow = args["FLOW"] if args["FLOW"] != None else ""
+        command = "dpctl del-flows tcp:" + str(tcpIP) + ":" + str(tcpPort) + " " +str(flow)
+        response = self.execute(cmd=command,prompt="ETH-Tutorial",timeout=240)
+        if utilities.assert_matches(expect='@',actual=response,onpass="Delete flow executed",onfail="Delete flow execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
+    def show(self,**flowParameters):
+        '''
+         show gives information on datapath switch including information on its flow tables and ports.
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        command = "dpctl show tcp:" + str(tcpIP) + ":" + str(tcpPort)
+        response = self.execute(cmd=command,prompt="miss_send_len=",timeout=240)
+        if utilities.assert_matches(expect='get_config_reply',actual=response,onpass="show command executed",onfail="show command execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
     def showStatus(self,**flowParameters):
         '''
-         showStatus will provide the Status of given parmetes using "dpctl" 
+         showStatus gives a series of key-value pairs that report the status of switch. 
+         If key is specified, only the key-value pairs whose key names begin with key are printed. 
         '''
-        return main.TRUE
+        args = utilities.parse_args(["TCPIP","TCPPORT","KEY"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        key = args["KEY"] if args["KEY"] != None else ""
+        command = "dpctl status tcp:" + str(tcpIP) + ":" + str(tcpPort) + " " + key
+        response = self.execute(cmd=command,prompt="(.*)",timeout=240)
+        if utilities.assert_matches(expect='(.*)',actual=response,onpass="show command executed",onfail="show command execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
+    def desc_set(self,**flowParameters):
+        '''
+         desc_set Sets the switch description (as returned in ofp_desc_stats) to string (max length is DESC_STR_LEN)
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT","STRING"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        string = " " + args["STRING"] if args["STRING"] != None else " DESC_STR_LEN"
+        command = "dpctl desc tcp:" + str(tcpIP) + ":" + str(tcpPort) + str(string)
+        response = self.execute(cmd=command,prompt="ETH-Tutorial",timeout=240)
+        if utilities.assert_matches(expect='@',actual=response,onpass="desc command executed",onfail="desc command execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
+
+    def dumpDesc(self,**flowParameters):
+        '''
+         dumpDesc Sets the switch description (as returned in ofp_desc_stats) to string (max length is DESC_STR_LEN)
+        '''
+        args = utilities.parse_args(["TCPIP","TCPPORT","STRING"],**flowParameters)
+        tcpIP = args["TCPIP"] if args["TCPIP"] != None else "127.0.0.1"
+        tcpPort = args["TCPPORT"] if args["TCPPORT"] != None else "6634"
+        command = "dpctl dump-desc tcp:" + str(tcpIP) + ":" + str(tcpPort) 
+        response = self.execute(cmd=command,prompt="Serial Num:",timeout=240)
+        if utilities.assert_matches(expect='stats_reply',actual=response,onpass="desc command executed",onfail="desc command execution Failed"):
+            main.last_result = main.TRUE
+            return main.TRUE
+        else :
+            main.last_result = main.FALSE
+            return main.FALSE
 
 if __name__ != "__main__":
     import sys
