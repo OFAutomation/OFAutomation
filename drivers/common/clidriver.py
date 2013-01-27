@@ -104,6 +104,7 @@ class CLI(Component):
         elif index ==3:
             main.log.error("Expected Prompt not found , Time Out!!") 
             return main.FALSE
+        main.last_response = self.LASTRSP
         return self.LASTRSP
         
     def runAsSudoUser(self,handle,pwd,default):

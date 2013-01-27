@@ -111,21 +111,37 @@ class Mininet(Emulator):
         else :
             main.log.error("Connection failed to the host") 
         
-    def dump(self,**kwargs):
+    def dump(self):
         main.log.info("Dump node info")
         self.execute(cmd = 'dump',prompt = 'mininet>',timeout = 10)
         return main.TRUE
             
-    def intfs(self,**kwargs):
+    def intfs(self):
         main.log.info("List interfaces")
         self.execute(cmd = 'intfs',prompt = 'mininet>',timeout = 10)
         return main.TRUE
     
-    def net(self,**kwargs):
+    def net(self):
         main.log.info("List network connections")
         self.execute(cmd = 'net',prompt = 'mininet>',timeout = 10)
+        return main.TRUE
     
-    def pingpair(self,**kwargs):
+    def iperf(self):
+        main.log.info("Simple iperf TCP test between two (optionally specified) hosts")
+        self.execute(cmd = 'iperf',prompt = 'mininet>',timeout = 10)
+        return main.TRUE
+    
+    def iperfudp(self):
+        main.log.info("Simple iperf TCP test between two (optionally specified) hosts")
+        self.execute(cmd = 'iperfudp',prompt = 'mininet>',timeout = 10)
+        return main.TRUE
+    
+    def nodes(self):
+        main.log.info("List all nodes.")
+        self.execute(cmd = 'nodes',prompt = 'mininet>',timeout = 10)    
+        return main.TRUE
+    
+    def pingpair(self):
         main.log.infoe("Ping between first two hosts")
         self.execute(cmd = 'pingpair',prompt = 'mininet>',timeout = 20)
         
@@ -138,13 +154,32 @@ class Mininet(Emulator):
             main.last_result = main.FALSE
             return main.FALSE
     
+    def link(self,**linkargs):
+        '''
+        Bring link(s) between two nodes up or down
+        '''
+        main.log.info('Bring link(s) between two nodes up or down')
+        args = utilities.parse_args(["END1","END2","OPTION"],**linkargs)
+        end1 = args["END1"] if args["END1"] != None else ""
+        end2 = args["END2"] if args["END2"] != None else ""
+        option = args["OPTION"] if args["OPTION"] != None else ""
+        command = "link "+str(end1) + " " + str(end2)+ " " + str(option)
+        response = self.execute(cmd=command,prompt="mininet>",timeout=10)
+        return main.TRUE
+        
+
     def dpctl(self,**dpctlargs):
-        
-        for key in kwargs:
-            vars(self)[key] = kwargs[key]
-            
+        '''
+         Run dpctl command on all switches.
+        '''
         main.log.info('Run dpctl command on all switches')
-        
+        args = utilities.parse_args(["CMD","ARGS"],**dpctlargs)
+        cmd = args["CMD"] if args["CMD"] != None else ""
+        cmdargs = args["ARGS"] if args["ARGS"] != None else ""
+        command = "dpctl "+cmd + " " + str(cmdargs)
+        response = self.execute(cmd=command,prompt="mininet>",timeout=10)
+        return main.TRUE
+   
         
     def get_version(self):
         file_input = path+'/lib/Mininet/INSTALL'

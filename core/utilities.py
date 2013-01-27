@@ -180,7 +180,7 @@ class Utilities:
             except SyntaxError:
                 print "functin definition is not write"
 
-       
+        main.last_result = result
         return result
     
     
