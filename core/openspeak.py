@@ -7,6 +7,7 @@ Created on 20-Dec-2012
 import re
 import inspect
 
+
 class OpenSpeak:
 
     def __init__(self):
@@ -50,7 +51,7 @@ class OpenSpeak:
         while index < len(openSpeakFile):
             ifelseMatch = re.match("\s+IF|\s+ELSE|\s+ELIF",openSpeakFile[index],flags=0)
             line = openSpeakFile[index]
-          
+            repeatMatch = re.match("\s*REPEAT", openSpeakFile[index], flags=0)
             if ifelseMatch :
                 result =  self.verify_and_translate(line) 
                 initialSpaces = len(line) -len(line.lstrip())
@@ -72,6 +73,22 @@ class OpenSpeak:
                         pass 
                     index = index + 1
                 self.flag = 0 
+            elif repeatMatch:
+                result =  self.verify_and_translate(line)
+                index = index + 1
+                endMatch = re.match("\s*END",openSpeakFile[index],flags=0)
+                while not endMatch :
+                    try :
+                        
+                        self.flag = self.flag + 1
+                        result =  result + self.verify_and_translate(openSpeakFile[index])
+                        index = index + 1
+                        print "REsult " * 9
+                        print result
+                    except IndexError :
+                        pass
+                    
+                                 
             else :
                 self.flag = 0
                 result = self.verify_and_translate(line)
@@ -105,7 +122,8 @@ class OpenSpeak:
         stepMatch = re.match("^STEP\s+\"(.*)\"",line,flags=0)
         connectMatch = re.match("^CONNECT\s+(\w+)\s+USING\s+(.*)",line,flags=0)
         disconnectMatch = re.match("^DISCONNECT\s+(.*)",line,flags=0)   
-        ondoMatch = re.match("^ON\s+(.*)\s+DO\s+(.*)\s+USING\s+(.*)",line,flags=0)
+        ondoMatch = re.match("^ON\s+(.*)\s+DO\s+(.*)",line,flags=0)
+        
         storeMatch = re.match("^STORE\s+(.*)\s+IN\s+(.*)",line,flags=0)
         variableMatch = re.match("^(.*)\s+=\s+(.*)",line,flags=0) 
         assertMatch = re.match("^ASSERT\s+(\w+)\s+(.*)\s+(.*)\s+ONPASS\s+(.*)\s+ONFAIL\s+(.*)",line,flags=0)
@@ -115,12 +133,17 @@ class OpenSpeak:
         elifloop = re.match("ELSE\sIF\s+(\w+)\s*(..|\w+)\s*(.*)",line,flags=0)
         forloopMatch = re.match("\s*REPEAT\s+(/d+)\s+TIMES",line,flags=0)
         experimentalMatch = re.match("EXPERIMENTAL\s+MODE\s+(\w+)",line,flags=0)
+        repeatMatch = re.match("\s*REPEAT\s+(\d+)\s+TIMES", line, flags=0)
         #conjuctionMatch = re.search("(.*)AND(.*)",line,flags=0)
        
         if caseMatch :
             self.CurrentStep = 0
             self.CurrentCase = "CASE" + caseMatch.group(1)
             resultString = resultString + self.translate_case_block(casenumber=caseMatch.group(1))
+        elif repeatMatch:
+            print "REPEAT MATCH" * 9
+            print repeatMatch.group(1)
+            resultString = resultString + indent + self.translate_repeat(repeat=repeatMatch.group(1))
         elif nameMatch : 
             resultString = resultString +  indent + self.translate_testcase_name(testname=nameMatch.group(1))
         elif commentMatch : 
@@ -134,9 +157,7 @@ class OpenSpeak:
         elif disconnectMatch :
             resultString = resultString + indent + self.translate_disconnect(component=disconnectMatch.group(1))
         elif ondoMatch :
-            resultString = resultString + indent + self.translate_onDOAs(component=ondoMatch.group(1),
-                                                                          action=ondoMatch.group(2),
-                                                                          arguments=ondoMatch.group(3))
+            resultString = resultString + indent + self.translate_onDOAs(component=ondoMatch.group(1),action=ondoMatch.group(2))  
         elif storeMatch :
             resultString = resultString + indent + self.translate_store(variable=storeMatch.group(1),
                                                                          value=storeMatch.group(2)) 
@@ -189,7 +210,19 @@ class OpenSpeak:
 
         return resultString
 
-  
+    def translate_repeat(self,**repeatStatement):
+        '''
+        this will transalte the repeat statement into a python equivalen while loop
+        '''
+        print "DDD" * 9
+        print repeatStatement
+        args = self.parse_args(["REPEAT"],**repeatStatement)
+        resultString = ''
+        
+        resultString = "i = 0"
+        resultString = resultString + "\n" + " " * 8 +"while i<" + args["REPEAT"] + " :"
+        return resultString
+     
     def translate_if_else_operator(self,**loopBlock):
         '''
           This method will translate if-else loop block into its equivalent python code.
@@ -376,7 +409,7 @@ class OpenSpeak:
         
         connectMatch = re.search("CONNECT\s+(\w+)\s+USING\s+(.*)",args["MESSAGE"],flags=0)
         disconnectMatch = re.search("DISCONNECT\s+(.*)",args["MESSAGE"],flags=0)   
-        ondoMatch = re.search("ON\s+(.*)\s+DO\s+(.*)USING\s+(.*)",args["MESSAGE"],flags=0)
+        ondoMatch = re.search("ON\s+(.*)\s+DO\s+(.*)",args["MESSAGE"],flags=0)
         paramsMatch = re.search("PARAMS\[(.*)\]|STEP\[(.*)\]|TOPO\[(.*)\]|CASE\[(.*)\]",args["MESSAGE"],flags=0)
         stringMatch = re.search("\"(.*)\"|\'(.*)\'",args["MESSAGE"],flags=0)
         variableMatch = re.search("\<(.*)\>",args["MESSAGE"],flags=0)
@@ -389,8 +422,7 @@ class OpenSpeak:
             resultString = resultString + self.translate_disconnect(component=disconnectMatch.group(1))
         elif ondoMatch :
             resultString = resultString + self.translate_onDOAs(component=ondoMatch.group(1),
-                                                                action=ondoMatch.group(2),
-                                                                arguments=ondoMatch.group(3))
+                                                                action=ondoMatch.group(2))
         elif paramsMatch :
             resultString = resultString + self.translate_parameters(parameters=args["MESSAGE"])
         elif stringMatch : 
@@ -473,25 +505,50 @@ class OpenSpeak:
         '''
         args = self.parse_args(["COMPONENT","ACTION","ARGUMENTS"],**onDoStatement)
         subString = ''
-        if args["ARGUMENTS"] != None :
-            subString = self.translate_usingas(arguments=args["ARGUMENTS"])  
-        resultString = ''
+        
+        usingMatch = re.match("\s*(.*)\s+USING\s+(.*)",args["ACTION"],flags=0)
+        action = ''
+        if usingMatch :
+            print "RR" * 9
+            action = usingMatch.group(1)
+            arguments = usingMatch.group(2)
+            subString = self.translate_usingas(arguments=arguments)
+        else :
+            andCheck = re.search ("(.*)\s+AND\s+(.*)",args["ACTION"],flags=0)
+            
+            action = action + "()"
+            if andCheck:
+                action = andCheck.group(1)
+                subString = subString + self.handle_conjuction(statement=andCheck.group(2))
+            else :
+                action = args["ACTION"]
+                action = action + "()"
         # convert the statement here    
-        resultString = "main." + args["COMPONENT"] + "." + args["ACTION"] + subString 
+        resultString = "main." + args["COMPONENT"] + "." + action + subString 
         return resultString
 
-
-    def translate_connect(self,**connectStatement):
+    
+    def handle_conjuction(self,**conjuctStatement):
         '''
-         This will translate the CONNECT <component_name> USING1 <arg1> AS <value1>, <arg2> AS <value2> 
-         into python equivalent to resultString and returns resultString
+        This will handle the conjuctions
         '''
-        args = self.parse_args(["COMPONENT","ARGUMENTS"],**connectStatement)
-        resultString = ''
-        subString = self.translate_usingas(arguments=args["ARGUMENTS"])
-        # convert the statement here    
-        resultString = "main." + args["COMPONENT"] + ".connect(" + subString + ")" 
-        return resultString
+        print conjuctStatement
+        args = self.parse_args(["STATEMENT"],**conjuctStatement)
+        subSentence = ''
+        print "U" * 9  
+        print args
+        storeMatch = re.match("\s*STORE\s+(.*)\s+IN\s+(.*)",args["STATEMENT"],flags=0)
+        assertMatch = re.match("\s*ASSERT\s+(\w+)\s+(.*)\s+(.*)\s+ONPASS\s+(.*)\s+ONFAIL\s+(.*)",args["STATEMENT"],flags=0)
+        if storeMatch :
+            subSentence =  "\n" + " " * 8 + self.translate_store(variable=storeMatch.group(1),
+                                                                         value=storeMatch.group(2))
+        elif assertMatch :
+            subSentence = "\n" + " " * 8 + self.translate_assertion(leftvalue=assertMatch.group(1),
+                                                                    operator=assertMatch.group(2),
+                                                                    rightvalue=assertMatch.group(3),
+                                                                    onpass=assertMatch.group(4),
+                                                                    onfail=assertMatch.group(5))
+        return subSentence
 
     def translate_usingas(self,**argumentAS) :
         '''
@@ -507,20 +564,12 @@ class OpenSpeak:
         andCheck = re.search ("(.*)\s+AND\s+(.*)",args["ARGUMENTS"],flags=0)
         if andCheck:
             line = andCheck.group(1)
-            storeMatch = re.match("\s*STORE\s+(.*)\s+IN\s+(.*)",andCheck.group(2),flags=0)
-            assertMatch = re.match("\s*ASSERT\s+(\w+)\s+(.*)\s+(.*)\s+ONPASS\s+(.*)\s+ONFAIL\s+(.*)",andCheck.group(2),flags=0)
-            if storeMatch :
-                subSentence =  "\n" + " " * 8 + self.translate_store(variable=storeMatch.group(1),
-                                                                         value=storeMatch.group(2))
-            elif assertMatch :
-                subSentence = "\n" + " " * 8 + self.translate_assertion(leftvalue=assertMatch.group(1),
-                                                                                operator=assertMatch.group(2),
-                                                                                rightvalue=assertMatch.group(3),
-                                                                                onpass=assertMatch.group(4),
-                                                                                onfail=assertMatch.group(5))
-
+            subSentence = self.handle_conjuction(statement=andCheck.group(2))
         else :
             line = args["ARGUMENTS"]
+            
+            
+        
         argsMatch = re.search("(.*),(.*)",line,flags=0)
 
 
@@ -546,6 +595,11 @@ class OpenSpeak:
                             subString = subString +  argsKey + "=" + argString
                         else :
                             subString = subString +  argsKey + "=" + argString + ","
+                else :
+                    if index == len(argsList) - 1 :
+                        subString = subString +  arguments
+                    else :
+                        subString = subString + arguments + ","  
         else :
             argMatch = re.search("(.*)\s+AS\s+(.*)",args["ARGUMENTS"],flags=0)
             if argMatch:
@@ -557,9 +611,25 @@ class OpenSpeak:
                 else :
                     argString = self.translate_parameters(parameters=argsValue)
                     subString = subString +  argsKey + "=" + argString
-
+            else :
+                subString = subString +  args["ARGUMENTS"]
+                
         resultString = "(" + subString + ")"+ subSentence
         return resultString
+
+
+    def translate_connect(self,**connectStatement):
+        '''
+         This will translate the CONNECT <component_name> USING1 <arg1> AS <value1>, <arg2> AS <value2> 
+         into python equivalent to resultString and returns resultString
+        '''
+        args = self.parse_args(["COMPONENT","ARGUMENTS"],**connectStatement)
+        resultString = ''
+        subString = self.translate_usingas(arguments=args["ARGUMENTS"])
+        # convert the statement here    
+        resultString = "main." + args["COMPONENT"] + ".connect(" + subString + ")" 
+        return resultString
+
 
     def translate_parameters(self,**parameterStatement):
         '''
