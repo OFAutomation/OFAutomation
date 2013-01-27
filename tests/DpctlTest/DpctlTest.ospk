@@ -5,7 +5,7 @@ CASE 1
     STEP "Adding Another Flow for Host3"
     ON DPCTL1 DO addFlow USING tcpip AS STEP["tcpip"], tcpport AS STEP["tcpport"], inport AS STEP["inport"] , timeout AS STEP["timeout"], action AS STEP["action"]
     STEP "Ping From h2 to h3"
-    ON Mininet1 DO pingHost USING src AS TOPO["DPCTL1"]["src"], target AS TOPO["DPCTL1"]["target"], controller AS TOPO["DPCTL1"]["controller"] AND STORE result IN LAST_RESULT 
+    ON Mininet1 DO pingHost USING src AS TOPO["DPCTL1"]["src"], target AS TOPO["DPCTL1"]["target"], controller AS TOPO["DPCTL1"]["controller"] AND STORE LAST_RESULT IN result 
     ASSERT result EQUALS main.TRUE ONPASS "Ping Successful" ONFAIL "Ping failed"
 
 CASE 2
@@ -15,5 +15,5 @@ CASE 2
     STEP "Adding Another Flow for Host3"
     ON DPCTL1 DO addFlow USING tcpip AS STEP["tcpip"], tcpport AS STEP["tcpport"], inport AS STEP["inport"] , timeout AS STEP["timeout"], action AS STEP["action"]
     STEP "Execute Show Flow"
-    ON DPCTL1 DO showFlow USING tcpip AS CASE["tcpip"], tcpport AS CASE["tcpport"] AND STORE result IN LAST_RESULT
+    ON DPCTL1 DO showFlow USING tcpip AS CASE["tcpip"], tcpport AS CASE["tcpport"] AND STORE LAST_RESULT IN result
     ASSERT result EQUALS main.TRUE ONPASS "SHOW FLOW IS EXECUTED" ONFAIL "Show Flow Execution failed"    
