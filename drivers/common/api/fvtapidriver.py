@@ -75,7 +75,7 @@ def test_set_init(config):
     basic_port_map = config["port_map"]
     basic_config = config
 
-class FvtDriver(API,templatetest.TemplateTest):
+class FvtApiDriver(API,templatetest.TemplateTest):
 
     def __init__(self):
         super(API, self).__init__()
@@ -109,6 +109,33 @@ class FvtDriver(API,templatetest.TemplateTest):
      
     def ofmsgSndCmp(self, snd_list, exp_list, xid_ignore=True, hdr_only=True):
         return testutils.ofmsgSndCmp(self, snd_list, exp_list, xid_ignore, hdr_only)
+    
+    def setRule(self,sv,rule,num_try) :
+        return testutils.setRule(self,sv,rule,num_try)
+    
+    def chkFlowdb(self,controller_number,switch_number,exp_count,exp_rewrites) :
+        return testutils.chkFlowdb(self,controller_number,switch_number,exp_count,exp_rewrites)
+    
+    def chkSwitchStats(self, switch_number, ofproto, exp_snd_count, exp_rcv_count):
+        return testutils.chkSwitchStats(self, switch_number, ofproto, exp_snd_count, exp_rcv_count)
+    
+    def chkSliceStats(self,controller_number,ofproto,exp_snd_count,exp_rcv_count) :
+        return testutils.chkSliceStats(self,controller_number,ofproto,exp_snd_count,exp_rcv_count)
+    
+    def recvStats(self,swId,typ) :
+        return testutils.recvStats(self,swId,typ)
+    
+    def ofmsgSndCmpWithXid(self,snd_list,exp_list,xid_ignore,hdr_only) :
+        return testutils.ofmsgSndCmpWithXid(self,snd_list,exp_list,xid_ignore,hdr_only)
+    
+    def genPacketOut(self,xid,buffer_id,in_port,action_ports,pkt) :
+        return testutils.genPacketOut(self,xid,buffer_id,in_port,action_ports,pkt)
+    
+    def genFlowModFlush(self) :
+        return testutils.genFlowModFlush()
+    
+    def genPhyPort(self,name,addr,port_no) :
+        return testutils.genPhyPort(name,addr,port_no)
     
     def disconnect(self,handle):
         response = ''

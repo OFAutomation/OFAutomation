@@ -11,9 +11,9 @@ import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.emulatordriver import Emulator
 
-class POX(Emulator):
+class PoxCliDriver(Emulator):
     '''
-        pox driver provides the basic functions of POX controller
+        PoxCliDriver driver provides the basic functions of POX controller
     '''
     def __init__(self):
         super(Emulator, self).__init__()
@@ -38,8 +38,8 @@ class POX(Emulator):
         self.name = self.options['name']
         
         poxLibPath = 'default'
-        copy = super(POX, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
-        self.handle = super(Emulator, self).connect(self.user_name, self.ip_address, self.pwd)
+        copy = super(PoxCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
+        self.handle = super(PoxCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
         self.handle.expect("openflow")
         if self.handle:
             command = self.getcmd(self.options)
@@ -66,7 +66,7 @@ class POX(Emulator):
 
     def get_version(self):
         file_input = path+'/lib/pox/core.py'
-        version = super(POX, self).get_version()
+        version = super(PoxCliDriver, self).get_version()
         pattern = '\s*self\.version(.*)'
         import re
         for line in open(file_input,'r').readlines():
@@ -101,4 +101,4 @@ class POX(Emulator):
 if __name__ != "__main__":
     import sys
 
-    sys.modules[__name__] = POX()    
+    sys.modules[__name__] = PoxCliDriver()    

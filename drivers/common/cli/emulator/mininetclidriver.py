@@ -4,7 +4,7 @@ Created on 26-Oct-2012
 
 @author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
 
-Mininet is the basic driver which will handle the Mininet functions
+MininetCliDriver is the basic driver which will handle the Mininet functions
 '''
 
 import pexpect
@@ -19,9 +19,9 @@ sys.path.append("../")
 from drivers.common.cli.emulatordriver import Emulator
 from drivers.common.clidriver import CLI
 
-class Mininet(Emulator):
+class MininetCliDriver(Emulator):
     '''
-        mininet is the basic driver which will handle the Mininet functions
+        MininetCliDriver is the basic driver which will handle the Mininet functions
     '''
     def __init__(self):
         super(Emulator, self).__init__()
@@ -35,8 +35,8 @@ class Mininet(Emulator):
             vars(self)[key] = kwargs[key]       
         
         self.name = self.options['name']
-        copy = super(Mininet, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/mininet/INSTALL', self.pwd,path+'/lib/Mininet/')
-        self.handle = super(Mininet, self).connect(self.user_name, self.ip_address, self.pwd)
+        copy = super(MininetCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/mininet/INSTALL', self.pwd,path+'/lib/Mininet/')
+        self.handle = super(MininetCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
         
         self.ssh_handle = self.handle
         
@@ -206,4 +206,4 @@ class Mininet(Emulator):
 
 if __name__ != "__main__":
     import sys
-    sys.modules[__name__] = Mininet()
+    sys.modules[__name__] = MininetCliDriver()

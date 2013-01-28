@@ -5,7 +5,7 @@
             <host> 192.168.56.101 </host>
             <user> = openflow </user>
             <password> openflow </password>
-            <type> Mininet </type>
+            <type> MininetCliDriver </type>
             <COMPONENTS>
                 # Specify the Option for mininet
                 <topo> single </topo>
@@ -17,7 +17,7 @@
             <host> 192.168.56.101 </host>
             <user> openflow </user>
             <password> openflow </password>
-            <type> POX </type>
+            <type> PoxCliDriver </type>
             <no-cli> 1 </no-cli>         #or '0' if want to run in cli mode
             <COMPONENTS>
                 <pox_lib_location> /home/openflow/pox/ </pox_lib_location>
