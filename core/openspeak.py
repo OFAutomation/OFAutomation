@@ -73,6 +73,7 @@ class OpenSpeak:
                     index = index + 1
                 self.flag = 0 
             elif repeatMatch:
+                self.flag = 0
                 result =  self.verify_and_translate(line)
                 index = index + 1
                 endMatch = re.match("\s*END",openSpeakFile[index],flags=0)
@@ -85,7 +86,7 @@ class OpenSpeak:
                         
                     except IndexError :
                         pass
-                    
+                   
                                  
             else :
                 self.flag = 0
@@ -132,7 +133,7 @@ class OpenSpeak:
         forloopMatch = re.match("\s*REPEAT\s+(/d+)\s+TIMES",line,flags=0)
         experimentalMatch = re.match("EXPERIMENTAL\s+MODE\s+(\w+)",line,flags=0)
         repeatMatch = re.match("\s*REPEAT\s+(\d+)\s+TIMES", line, flags=0)
-        #conjuctionMatch = re.search("(.*)AND(.*)",line,flags=0)
+        
        
         if caseMatch :
             self.CurrentStep = 0
@@ -437,7 +438,7 @@ class OpenSpeak:
         args = self.parse_args(["OPERATOR"],**operatorStatement)
         
         resultString = ''
-        equalsMatch = re.match("EQUALS$|=$",args["OPERATOR"],flags=0)
+        equalsMatch = re.match("EQUALS$|==$",args["OPERATOR"],flags=0)
         greaterMatch = re.match("GREATER\s+THAN$|>$",args["OPERATOR"],flags=0)
         lesserMatch = re.match("LESSER\s+THAN$|<$",args["OPERATOR"],flags=0)
         stringMatch = re.match("MATCHES|~$",args["OPERATOR"],flags=0)
@@ -499,7 +500,7 @@ class OpenSpeak:
   
     def translate_onDOAs(self,**onDoStatement):
         '''
-         This will translate the ON <component> DO <action> USING <arg1> AS <value1><arg2> AS <value2>
+         This will translate the ON <component> DO <action> USING <arg1> AS <value1>,<arg2> AS <value2>
          into python equivalent to resultString and returns resultString
         '''
         args = self.parse_args(["COMPONENT","ACTION","ARGUMENTS"],**onDoStatement)
@@ -508,16 +509,16 @@ class OpenSpeak:
         usingMatch = re.match("\s*(.*)\s+USING\s+(.*)",args["ACTION"],flags=0)
         action = ''
         if usingMatch :
-            
             action = usingMatch.group(1)
             arguments = usingMatch.group(2)
             subString = self.translate_usingas(arguments=arguments)
+            
         else :
             andCheck = re.search ("(.*)\s+AND\s+(.*)",args["ACTION"],flags=0)
             
             action = action + "()"
             if andCheck:
-                action = andCheck.group(1)
+                action = andCheck.group(1) + "()"
                 subString = subString + self.handle_conjuction(statement=andCheck.group(2))
             else :
                 action = args["ACTION"]
@@ -610,7 +611,7 @@ class OpenSpeak:
                     argString = self.translate_parameters(parameters=argsValue)
                     subString = subString +  argsKey + "=" + argString
             else :
-                subString = subString +  args["ARGUMENTS"]
+                subString = subString +  line
                 
         resultString = "(" + subString + ")"+ subSentence
         return resultString
