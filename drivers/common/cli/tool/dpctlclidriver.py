@@ -21,14 +21,14 @@ class DpctlCliDriver(Tools):
      DpctlCliDriver driver class provides the basic functions of DPCTL controller
     '''
     def __init__(self):
-        super(DPCTL, self).__init__()
+        super(DpctlCliDriver, self).__init__()
         self.handle = self
         self.wrapped = sys.modules[__name__]
     
     def connect(self,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
         self.name = options['name']
-        self.handle = super(DPCTL, self).connect(user_name, ip_address, pwd)
+        self.handle = super(DpctlCliDriver, self).connect(user_name, ip_address, pwd)
         if self.handle :
             main.log.info("Connected to the host")
         else :

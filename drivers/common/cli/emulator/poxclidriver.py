@@ -38,8 +38,8 @@ class PoxCliDriver(Emulator):
         self.name = self.options['name']
         
         poxLibPath = 'default'
-        copy = super(POX, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
-        self.handle = super(Emulator, self).connect(self.user_name, self.ip_address, self.pwd)
+        copy = super(PoxCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
+        self.handle = super(PoxCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
         self.handle.expect("openflow")
         if self.handle:
             command = self.getcmd(self.options)
