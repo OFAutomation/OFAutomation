@@ -5,7 +5,7 @@
             'host' = '192.168.56.101'
             'user' = 'openflow'
             'password' = 'openflow'
-            'type' = "Mininet"
+            'type' = "MininetCliDriver"
             [[[["COMPONENTS"]]]]
                 # Specify the Option for mininet
                 'topo' = 'single'
@@ -16,7 +16,7 @@
             'host' = '192.168.56.101'
             'user' = 'openflow'
             'password' = 'openflow'
-            'type' = 'POX'
+            'type' = 'PoxCliDriver'
             'no-cli' = '1' #or '0' if want to run in cli mode
             'location' = 'default' #"/home/openflow/OFAutomation-OFAutomation-0.0.1/lib/pox/"
             [[[["COMPONENTS"]]]]

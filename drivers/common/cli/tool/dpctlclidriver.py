@@ -16,9 +16,9 @@ import re
 import os
 import sys
 
-class DPCTL(Tools):
+class DpctlCliDriver(Tools):
     '''
-     DPCTL driver class provides the basic functions of DPCTL controller
+     DpctlCliDriver driver class provides the basic functions of DPCTL controller
     '''
     def __init__(self):
         super(DPCTL, self).__init__()
@@ -221,4 +221,4 @@ class DPCTL(Tools):
 
 if __name__ != "__main__":
     import sys
-    sys.modules[__name__] = DPCTL()
+    sys.modules[__name__] = DpctlCliDriver()

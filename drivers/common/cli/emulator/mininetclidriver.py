@@ -19,9 +19,9 @@ sys.path.append("../")
 from drivers.common.cli.emulatordriver import Emulator
 from drivers.common.clidriver import CLI
 
-class Mininet(Emulator):
+class MininetCliDriver(Emulator):
     '''
-        mininet is the basic driver which will handle the Mininet functions
+        MininetCliDriver is the basic driver which will handle the Mininet functions
     '''
     def __init__(self):
         super(Emulator, self).__init__()
@@ -206,4 +206,4 @@ class Mininet(Emulator):
 
 if __name__ != "__main__":
     import sys
-    sys.modules[__name__] = Mininet()
+    sys.modules[__name__] = MininetCliDriver()

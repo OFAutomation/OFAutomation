@@ -75,7 +75,7 @@ def test_set_init(config):
     basic_port_map = config["port_map"]
     basic_config = config
 
-class FvtDriver(API,templatetest.TemplateTest):
+class FvtApiDriver(API,templatetest.TemplateTest):
 
     def __init__(self):
         super(API, self).__init__()
@@ -117,7 +117,7 @@ class FvtDriver(API,templatetest.TemplateTest):
         return testutils.chkFlowdb(self,controller_number,switch_number,exp_count,exp_rewrites)
     
     def chkSwitchStats(self, switch_number, ofproto, exp_snd_count, exp_rcv_count):
-        return testutils.chkSwitchStats(self, switch_number, ofproto, exp_snd_count, exp_rcv_count):
+        return testutils.chkSwitchStats(self, switch_number, ofproto, exp_snd_count, exp_rcv_count)
     
     def chkSliceStats(self,controller_number,ofproto,exp_snd_count,exp_rcv_count) :
         return testutils.chkSliceStats(self,controller_number,ofproto,exp_snd_count,exp_rcv_count)

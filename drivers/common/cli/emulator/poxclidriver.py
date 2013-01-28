@@ -11,9 +11,9 @@ import struct, fcntl, os, sys, signal
 import sys
 from drivers.common.cli.emulatordriver import Emulator
 
-class POX(Emulator):
+class PoxCliDriver(Emulator):
     '''
-        pox driver provides the basic functions of POX controller
+        PoxCliDriver driver provides the basic functions of POX controller
     '''
     def __init__(self):
         super(Emulator, self).__init__()
@@ -101,4 +101,4 @@ class POX(Emulator):
 if __name__ != "__main__":
     import sys
 
-    sys.modules[__name__] = POX()    
+    sys.modules[__name__] = PoxCliDriver()    
