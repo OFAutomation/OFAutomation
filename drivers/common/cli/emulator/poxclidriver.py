@@ -66,7 +66,7 @@ class PoxCliDriver(Emulator):
 
     def get_version(self):
         file_input = path+'/lib/pox/core.py'
-        version = super(POX, self).get_version()
+        version = super(PoxCliDriver, self).get_version()
         pattern = '\s*self\.version(.*)'
         import re
         for line in open(file_input,'r').readlines():
