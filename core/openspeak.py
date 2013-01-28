@@ -473,9 +473,9 @@ class OpenSpeak:
         '''
         args = self.parse_args(["VARIABLE","VALUE"],**storeStatement)
         resultString = ''
-        # convert the statement here     
-        ondoMatch = re.match("\s*ON\s+(.*)\s+DO\s+(.*)",args["VALUE"],flags=0)
-        paramsMatch = re.search("PARAMS\[(.*)\]|STEP\[(.*)\]|TOPO\[(.*)\]|CASE\[(.*)\]|LAST_RESULT|LAST_RESPONSE",args["VALUE"],flags=0)
+        # convert the statement here
+        ondoMatch = re.match("^\s*ON\s+(.*)\s+DO\s+(.*)",args["VALUE"],flags=0)
+        paramsMatch = re.match("^\s*PARAMS\[(.*)\]|STEP\[(.*)\]|TOPO\[(.*)\]|CASE\[(.*)\]|LAST_RESULT|LAST_RESPONSE",args["VALUE"],flags=0)
         if paramsMatch :
             argString = self.translate_parameters(parameters=args["VALUE"])
             resultString = args["VARIABLE"] + " = " + argString
@@ -611,8 +611,11 @@ class OpenSpeak:
                     argString = self.translate_parameters(parameters=argsValue)
                     subString = subString +  argsKey + "=" + argString
             else :
-                subString = subString +  line
-                
+                paramsMatch = re.match("PARAMS\[(.*)\]|STEP\[(.*)\]|TOPO\[(.*)\]|CASE\[(.*)\]|LAST_RESPONSE|LAST_RESULT",line,flags=0)
+                if paramsMatch :
+                    subString = subString + self.translate_parameters(parameters=line)
+                else :
+                    subString = subString +  line
         resultString = "(" + subString + ")"+ subSentence
         return resultString
 
