@@ -10,4 +10,4 @@ CASE 2
     STEP "Checking Hosts reachability by using pingall"
     STORE ON Mininet1 DO pingall IN result
     STEP "Verifying the result"
-    ASSERT result EQUALS main.TRUE ONPASS "All hosts are reacchable" ONFAIL "Hosts are not reachable
+    ASSERT result EQUALS main.TRUE ONPASS "All hosts are reacchable" ONFAIL "Hosts are not reachable"

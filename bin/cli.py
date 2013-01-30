@@ -332,6 +332,22 @@ class CLI( threading.Thread,Cmd,object ):
             print translated_code
         except AttributeError, e:
             print 'Dynamic params are not allowed in single statement translations'
+        
+    def do_do (self,line):
+        '''
+        Do will translate and execute the openspeak statement for the paused test.
+        do <OpenSpeak statement>
+        '''
+        if testthread:
+            from core import openspeak
+            ospk = openspeak.OpenSpeak()
+            try :
+                translated_code = ospk.interpret(text=line)
+                eval(translated_code)
+            except (AttributeError,SyntaxError), e:
+                print 'Dynamic params are not allowed in single statement translations'
+        else :
+            print "Do will translate and execute the openspeak statement for the paused test.\nPlease use interpret to translate the OpenSpeak statement."
             
     def do_compile(self,line):
         '''

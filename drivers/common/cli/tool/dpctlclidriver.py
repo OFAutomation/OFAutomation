@@ -25,10 +25,14 @@ class DpctlCliDriver(Tools):
         self.handle = self
         self.wrapped = sys.modules[__name__]
     
-    def connect(self,user_name, ip_address, pwd,options):
-        # Here the main is the OFAutomation instance after creating all the log handles.
-        self.name = options['name']
-        self.handle = super(DpctlCliDriver, self).connect(user_name, ip_address, pwd)
+    def connect(self,**connectrgs):
+        
+        for key in connectrgs:
+            vars(self)[key] = connectrgs[key]       
+        
+        self.name = self.options['name']
+        
+        self.handle = super(DpctlCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
         if self.handle :
             main.log.info("Connected to the host")
         else :

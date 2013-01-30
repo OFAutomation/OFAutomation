@@ -28,11 +28,11 @@ class MininetCliDriver(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self, **kwargs):
+    def connect(self, **connectrgs):
         #,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
-        for key in kwargs:
-            vars(self)[key] = kwargs[key]       
+        for key in connectrgs:
+            vars(self)[key] = connectrgs[key]       
         
         self.name = self.options['name']
         copy = super(MininetCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/mininet/INSTALL', self.pwd,path+'/lib/Mininet/')
@@ -61,7 +61,7 @@ class MininetCliDriver(Emulator):
             main.log.info("Network is being launched")
 
         else :
-            main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
+            main.log.error("Connection failed to the host"+self.user_name+"@"+self.ip_address) 
             main.log.error("Failed to connect to the Mininet")
                        
     def pingall(self):

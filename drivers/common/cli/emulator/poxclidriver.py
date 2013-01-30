@@ -20,7 +20,7 @@ class PoxCliDriver(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self, **kwargs):
+    def connect(self, **connectrgs):
         #,user_name, ip_address, pwd,options):
         '''
           this subroutine is to launch pox controller . It must have arguments as : 
@@ -32,16 +32,17 @@ class PoxCliDriver(Emulator):
           *** host is here a virtual mahine or system where pox framework hierarchy exists
         '''
         
-        for key in kwargs:
-            vars(self)[key] = kwargs[key]       
+        for key in connectrgs:
+            vars(self)[key] = connectrgs[key]       
         
         self.name = self.options['name']
         
         poxLibPath = 'default'
         copy = super(PoxCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
         self.handle = super(PoxCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
-        self.handle.expect("openflow")
+        
         if self.handle:
+            self.handle.expect("openflow")
             command = self.getcmd(self.options)
             #print command       
             main.log.info("Entering into POX hierarchy")
@@ -53,7 +54,7 @@ class PoxCliDriver(Emulator):
             main.log.info("launching POX controller with given components")
             self.execute(cmd=command,prompt="DEBUG:",timeout=120)
         else :
-            main.log.error("Connection failed to the host"+user_name+"@"+ip_address)
+            main.log.error("Connection failed to the host"+self.user_name+"@"+self.ip_address)
             main.log.error("Failed to connect to the POX controller")
     
         
