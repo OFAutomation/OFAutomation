@@ -82,9 +82,9 @@ class FvtApiDriver(API,templatetest.TemplateTest):
         print 'init'
                                                 
 
-    def connect(self,**connectrgs):
-        for key in connectrgs:
-            vars(self)[key] = connectrgs[key]
+    def connect(self,**connectargs):
+        for key in connectargs:
+            vars(self)[key] = connectargs[key]
         
         self.name = self.options['name']
         connect_result = super(API,self).connect()

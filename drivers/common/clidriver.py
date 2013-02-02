@@ -19,16 +19,23 @@ class CLI(Component):
     def __init__(self):
         super(Component, self).__init__()
         
-    def connect(self,user_name, ip_address, pwd):
+    def connect(self,**connectargs):
         '''
            Connection will establish to the remote host using ssh.
            It will take user_name ,ip_address and password as arguments<br>
            and will return the handle. 
         '''
+        for key in connectargs:
+            vars(self)[key] = connectargs[key]
+            
         connect_result = super(CLI, self).connect()
         ssh_newkey = 'Are you sure you want to continue connecting'
-        refused = "ssh: connect to host "+ip_address+" port 22: Connection refused"
-        self.handle =pexpect.spawn('ssh '+user_name+'@'+ip_address)
+        refused = "ssh: connect to host "+self.ip_address+" port 22: Connection refused"
+        if self.port:
+            self.handle =pexpect.spawn('ssh -p '+self.port+' '+self.user_name+'@'+self.ip_address)
+        else :
+            self.handle =pexpect.spawn('ssh '+self.user_name+'@'+self.ip_address)
+            
         self.handle.logfile = self.logfile_handler
         i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF,pexpect.TIMEOUT,refused],120)
         
@@ -38,14 +45,14 @@ class CLI(Component):
             i=self.handle.expect([ssh_newkey,'password:',pexpect.EOF])
         if i==1:
             main.log.info("ssh connection asked for password, gave password")
-            self.handle.sendline(pwd)
-            self.handle.expect(user_name)
+            self.handle.sendline(self.pwd)
+            self.handle.expect('>|#|$')
             
         elif i==2:
             main.log.error("Connection timeout")
             return main.FALSE
         elif i==3: #timeout
-            main.log.error("No route to the Host "+user_name+"@"+ip_address)
+            main.log.error("No route to the Host "+self.user_name+"@"+self.ip_address)
             return main.FALSE
         elif i==4:
             main.log.error("ssh: connect to host "+ip_address+" port 22: Connection refused")

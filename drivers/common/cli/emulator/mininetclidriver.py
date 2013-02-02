@@ -28,15 +28,15 @@ class MininetCliDriver(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self, **connectrgs):
+    def connect(self, **connectargs):
         #,user_name, ip_address, pwd,options):
         # Here the main is the OFAutomation instance after creating all the log handles.
-        for key in connectrgs:
-            vars(self)[key] = connectrgs[key]       
+        for key in connectargs:
+            vars(self)[key] = connectargs[key]       
         
         self.name = self.options['name']
         copy = super(MininetCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/mininet/INSTALL', self.pwd,path+'/lib/Mininet/')
-        self.handle = super(MininetCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
+        self.handle = super(MininetCliDriver, self).connect(user_name = self.user_name, ip_address = self.ip_address,port = None, pwd = self.pwd)
         
         self.ssh_handle = self.handle
         

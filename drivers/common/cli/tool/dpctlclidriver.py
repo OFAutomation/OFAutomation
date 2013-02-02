@@ -25,14 +25,14 @@ class DpctlCliDriver(Tools):
         self.handle = self
         self.wrapped = sys.modules[__name__]
     
-    def connect(self,**connectrgs):
+    def connect(self,**connectargs):
         
-        for key in connectrgs:
-            vars(self)[key] = connectrgs[key]       
+        for key in connectargs:
+            vars(self)[key] = connectargs[key]       
         
         self.name = self.options['name']
         
-        self.handle = super(DpctlCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
+        self.handle = super(DpctlCliDriver, self).connect(user_name = self.user_name, ip_address = self.ip_address,port = None, pwd = self.pwd)
         if self.handle :
             main.log.info("Connected to the host")
         else :

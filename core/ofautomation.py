@@ -134,9 +134,10 @@ class OFAutomation:
         driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
         driverClass = getattr(driverModule, driverName)
         driverObject = driverClass()
-        driverObject.connect(user_name = self.componentDictionary[component]['user'],
-                             ip_address= self.componentDictionary[component]['host'],
-                             pwd = self.componentDictionary[component]['password'],
+        driverObject.connect(user_name = self.componentDictionary[component]['user'] if ('user' in self.componentDictionary[component].keys()) else 'paxterra',
+                             ip_address= self.componentDictionary[component]['host'] if ('host' in self.componentDictionary[component].keys()) else 'localhost',
+                             pwd = self.componentDictionary[component]['password'] if ('password' in self.componentDictionary[component].keys()) else 'paxterra',
+                             port = self.componentDictionary[component]['port'] if ('port' in self.componentDictionary[component].keys()) else None,
                              options = driver_options)
             
         vars(self)[component] = driverObject

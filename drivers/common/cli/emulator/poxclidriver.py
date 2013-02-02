@@ -20,7 +20,7 @@ class PoxCliDriver(Emulator):
         self.handle = self
         self.wrapped = sys.modules[__name__]
 
-    def connect(self, **connectrgs):
+    def connect(self, **connectargs):
         #,user_name, ip_address, pwd,options):
         '''
           this subroutine is to launch pox controller . It must have arguments as : 
@@ -32,14 +32,14 @@ class PoxCliDriver(Emulator):
           *** host is here a virtual mahine or system where pox framework hierarchy exists
         '''
         
-        for key in connectrgs:
-            vars(self)[key] = connectrgs[key]       
+        for key in connectargs:
+            vars(self)[key] = connectargs[key]       
         
         self.name = self.options['name']
         
         poxLibPath = 'default'
         copy = super(PoxCliDriver, self).secureCopy(self.user_name, self.ip_address,'/home/openflow/pox/pox/core.py', self.pwd,path+'/lib/pox/')
-        self.handle = super(PoxCliDriver, self).connect(self.user_name, self.ip_address, self.pwd)
+        self.handle = super(PoxCliDriver, self).connect(user_name = self.user_name, ip_address = self.ip_address,port = None, pwd = self.pwd)
         
         if self.handle:
             self.handle.expect("openflow")
