@@ -4,7 +4,7 @@ Created on 26-Oct-2012
 
 @author: Anil Kumar (anilkumar.s@paxterrasolutions.com)
 
-Mininet is the basic driver which will handle the Mininet functions
+fvtapidriver is the basic driver which will handle the fvtapidriver functions
 '''
 '''
 There are two changes required in flowvisor-test framework :
@@ -38,25 +38,7 @@ import oftest.error as error
 import socket
 import __builtin__
 
-config_default = {
-    "param"              : None,
-    "fv_cmd"             : "/home/openflow/flowvisor/scripts/flowvisor.sh",
-    "platform"           : "local",
-    "controller_host"    : "127.0.0.1",
-    "controller_port"    : 6633,
-    "timeout"            : 3,
-    "port_count"         : 4,
-    "base_of_port"       : 1,
-    "base_if_index"      : 1,
-    "test_spec"          : "all",
-    "test_dir"           : ".",
-    "log_file"           : "/home/openflow/fvt.log",
-    "list"               : False,
-    "debug"              : "debug",
-    "dbg_level"          : logging.DEBUG,
-    "port_map"           : {},
-    "test_params"        : "None"
-}
+config_default = {}
 
 def test_set_init(config):
     """
@@ -87,6 +69,7 @@ class FvtApiDriver(API,templatetest.TemplateTest):
             vars(self)[key] = connectargs[key]
         
         self.name = self.options['name']
+        config_default = self.options['config_default']
         connect_result = super(API,self).connect()
         self.logFileName = main.logdir+"/"+self.name+".session"
         config_default["log_file"] = self.logFileName

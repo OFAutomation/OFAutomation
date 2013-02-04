@@ -7,6 +7,25 @@
             <password> openflow</password>
             <type>FvtApiDriver</type>
             <COMPONENTS>
+                <config_default>
+                    <param>None</param>
+                    <fv_cmd>/home/openflow/flowvisor/scripts/flowvisor.sh </fv_cmd>
+                    <platform>"local"</platform>
+                    <controller_host> 127.0.0.1 </controller_host>
+                    <controller_port> 6633 </controller_port>
+                    <timeout> 3 </timeout>
+                    <port_count> 4 </port_count>
+                    <base_of_port> 1 </base_of_port>
+                    <base_if_index> 1 </base_if_index>
+                    <test_spec> all </test_spec>
+                    <test_dir> . </test_dir>
+                    <log_file> /home/openflow/fvt.log </log_file>
+                    <list> False </list>
+                    <debug> debug </debug>
+                    <dbg_level> logging.DEBUG </dbg_level>
+                    <port_map> {} </port_map>
+                    <test_params> None </test_params> 
+                </config_default>
             </COMPONENTS>   
         </FVT>        
     </COMPONENT>

@@ -9,6 +9,7 @@ ofautomation is the main module.
 '''
 
 import sys
+import getpass
 import os
 import re
 import __builtin__
@@ -20,7 +21,7 @@ global path, drivers_path, core_path, tests_path,logs_path
 path = re.sub("(core|bin)$", "", os.getcwd())
 drivers_path = path+"drivers/"
 core_path = path+"core"
-tests_path = path+"tests/"
+tests_path = path+"tests"
 logs_path = path+"logs/"
 config_path = path + "config/"
 sys.path.append(path)
@@ -134,9 +135,9 @@ class OFAutomation:
         driverModule = __import__(classPath, globals(), locals(), [driverName.lower()], -1)
         driverClass = getattr(driverModule, driverName)
         driverObject = driverClass()
-        driverObject.connect(user_name = self.componentDictionary[component]['user'] if ('user' in self.componentDictionary[component].keys()) else 'paxterra',
+        driverObject.connect(user_name = self.componentDictionary[component]['user'] if ('user' in self.componentDictionary[component].keys()) else getpass.getuser(),
                              ip_address= self.componentDictionary[component]['host'] if ('host' in self.componentDictionary[component].keys()) else 'localhost',
-                             pwd = self.componentDictionary[component]['password'] if ('password' in self.componentDictionary[component].keys()) else 'paxterra',
+                             pwd = self.componentDictionary[component]['password'] if ('password' in self.componentDictionary[component].keys()) else 'changeme',
                              port = self.componentDictionary[component]['port'] if ('port' in self.componentDictionary[component].keys()) else None,
                              options = driver_options)
             

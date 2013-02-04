@@ -19,4 +19,4 @@ CASE 1
      STEP "Using assert_lesser to verify the result lesser or not"
      expect = 5
      actual = 10
-     ASSERT actual LESSER THAN expect ONPASS "expect is lesser than the actual" ONFAIL "expect is not lesser than the actual
+     ASSERT actual LESSER THAN expect ONPASS "expect is lesser than the actual" ONFAIL "expect is not lesser than the actual"
