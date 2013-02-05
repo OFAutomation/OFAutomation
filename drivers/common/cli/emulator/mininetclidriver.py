@@ -44,20 +44,21 @@ class MininetCliDriver(Emulator):
         if self.handle :
             #self.handle.logfile = sys.stdout
             main.log.info("Clearing any residual state or processes")
-            result = self.execute(cmd="sudo mn -c",timeout=120,prompt="(.*)")
+            result = self.execute(cmd="sudo mn -c",timeout=10,prompt="openflow@ETH-Tutorial:~\$")
 
             main.log.info("Password providing for running at sudo mode")
-            result2 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
+            result2 = self.execute(cmd="openflow",timeout=10,prompt="openflow@ETH-Tutorial:~\$")
             #preparing command to launch mininet
             main.log.info("Launching network using mininet")   
             cmdString = "sudo mn --topo "+self.options['topo']+","+self.options['topocount']+" --mac --switch "+self.options['switch']+" --controller "+self.options['controller']
-            result4 = self.execute(cmd=cmdString,timeout=120,prompt="mininet")
+            result4 = self.execute(cmd=cmdString,timeout=10,prompt="mininet>|[p|P]assword")
             pattern = '[p|P]assword'
             result3 = ''
-            #if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
-            #    result3 = self.execute(cmd="openflow",timeout=120,prompt="openflow@ETH-Tutorial:~\$")
-            #else:
-            #    result3 = result4
+            
+            if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
+                result3 = self.execute(cmd="openflow",timeout=10,prompt="mininet>")
+            else:
+                result3 = result4
             main.log.info("Network is being launched")
 
         else :

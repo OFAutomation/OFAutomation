@@ -230,7 +230,7 @@ class OFAutomation:
         result = self.TRUE
         self.logger.testSummary(self)
         
-        self.reportFile.close()
+        #self.reportFile.close()
         # Closing all the driver's session files
         for driver in self.componentDictionary.keys():
            vars(self)[driver].close_log_handles()

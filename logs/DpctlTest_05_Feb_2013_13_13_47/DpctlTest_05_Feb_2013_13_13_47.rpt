@@ -1,0 +1,137 @@
+
+                                +----------------+
+------------------------------ { Script And Files }  ------------------------------
+                                +----------------+
+
+	Script Log File : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/DpctlTest_05_Feb_2013_13_13_47/DpctlTest_05_Feb_2013_13_13_47.log
+	Report Log File : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/DpctlTest_05_Feb_2013_13_13_47/DpctlTest_05_Feb_2013_13_13_47.rpt
+	DPCTL1 Session Log : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/DpctlTest_05_Feb_2013_13_13_47/DPCTL1.session
+	Mininet1 Session Log : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/DpctlTest_05_Feb_2013_13_13_47/Mininet1.session
+	Test Script :/home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/DpctlTest.py
+	Test Params : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/DpctlTest.params
+	Topology : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/DpctlTest.tpl
+                              +------------------+
+---------------------------  { Script Exec Params }  ---------------------------
+                              +------------------+
+
+	
+	'CASE1': 
+	'tcpip': '127.0.0.1'
+	 'destination': 'h2'
+	 'STEP2': 
+	'action': 'output:3'
+	 'tcpip': '127.0.0.1'
+	 'inport': '2'
+	 'timeout': '360'
+	 'tcpport': '6634'
+	
+	 'STEP1': 
+	'action': 'output:2'
+	 'tcpip': '127.0.0.1'
+	 'inport': '1'
+	 'timeout': '360'
+	 'tcpport': '6634'
+	
+	 'tcpport': '6634'
+	
+	 'mail': 'paxweb@paxterrasolutions.com'
+	 'testcases': '1
+	2'
+	 'CASE2': 
+	'tcpip': '127.0.0.1'
+	 'destination': 'h2'
+	 'STEP2': 
+	'action': 'output:3'
+	 'tcpip': '127.0.0.1'
+	 'inport': '2'
+	 'timeout': '360'
+	 'tcpport': '6634'
+	
+	 'STEP1': 
+	'action': 'output:2'
+	 'tcpip': '127.0.0.1'
+	 'inport': '1'
+	 'timeout': '360'
+	 'tcpport': '6634'
+	
+	 'tcpport': '6634'
+	
+	
+
+                               +---------------+
+----------------------------- { Components Used }  -----------------------------
+                               +---------------+
+	DPCTL1-Test Target
+	Mininet1
+
+
+                              +--------+
+---------------------------- { Topology }  ----------------------------
+                              +--------+
+
+	
+	'DPCTL1': 
+	'src': 'h2'
+	 'controller': 'c1'
+	 'target': 'h3'
+	 'COMPONENTS': ''
+	 'test_target': '1'
+	 'password': 'openflow'
+	 'type': 'DpctlCliDriver'
+	 'host': '192.168.56.101'
+	 'user': 'openflow'
+	
+	 'Mininet1': 
+	'host': '192.168.56.101'
+	 'password': 'openflow'
+	 'type': 'MininetCliDriver'
+	 'user': 'openflow'
+	 'COMPONENTS': 
+	'topo': 'single'
+	 'topocount': '3'
+	 'switch': 'ovsk'
+	 'controller': 'remote'
+	
+	
+	
+------------------------------------------------------------
+
+******************************
+ CASE INIT 
+******************************
+
+[REPORT] [05 Feb 2013 13:13:53] not asking for Password
+******************************
+ Result summary for Testcase1
+******************************
+
+[REPORT] [05 Feb 2013 13:13:56] Host is not reachable
+[REPORT] [05 Feb 2013 13:13:56] Ping failed
+*****************************
+ Result: Failed 
+*****************************
+
+******************************
+ Result summary for Testcase2
+******************************
+
+*****************************
+ Result: Pass 
+*****************************
+
+
+*************************************
+	Test Execution Summary
+
+************************************* 
+
+ Test Start           : 05 Feb 2013 13:13:47
+ Test End             : 05 Feb 2013 13:13:56
+ Execution Time       : 0:00:09.532543
+ Total tests planned  : 2
+ Total tests RUN      : 2
+ Total Pass           : 1
+ Total Fail           : 1
+ Total No Result      : 0
+ Success Percentage   : 50%
+ Execution Result     : 100%

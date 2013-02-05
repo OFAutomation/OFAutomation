@@ -76,6 +76,7 @@ class Logger:
         #enter into report file all headers
         main.reportFile = open(main.ReportFileName,"w+")
         main.reportFile.write(logmsg)
+        main.reportFile.close()
         
     def initlog(self,main):
         '''
@@ -110,7 +111,10 @@ class Logger:
             currentTime = currentTime.strftime("%d %b %Y %H:%M:%S")
             newmsg = "\n[REPORT] " +"["+ str(currentTime)+"] "+msg
             print newmsg
+            main.reportFile = open(main.ReportFileName,"a+")
             main.reportFile.write(newmsg)
+            main.reportFile.close()
+            
             
         main.log.report = report 
         
@@ -119,7 +123,9 @@ class Logger:
                Will append the raw formatted message to the logs
             '''
             main.log._log(7,exmsg,"OpenFlowAutoMattion","OFAutoMation")
+            main.reportFile = open(main.ReportFileName,"a+")
             main.reportFile.write(exmsg)
+            main.reportFile.close()
             logfile = open(main.LogFileName,"a")
             logfile.write("\n"+ str(exmsg) +"\n")
             logfile.close()

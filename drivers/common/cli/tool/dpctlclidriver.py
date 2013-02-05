@@ -36,7 +36,7 @@ class DpctlCliDriver(Tools):
         if self.handle :
             main.log.info("Connected to the host")
         else :
-            main.log.error("Connection failed to the host"+user_name+"@"+ip_address) 
+            main.log.error("Connection failed to the host"+self.user_name+"@"+self.ip_address) 
 
 
     def addFlow(self,**flowParameters):
