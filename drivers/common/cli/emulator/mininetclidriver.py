@@ -44,23 +44,23 @@ class MininetCliDriver(Emulator):
         if self.handle :
             #self.handle.logfile = sys.stdout
             main.log.info("Clearing any residual state or processes")
-            result = self.execute(cmd="sudo mn -c",timeout=10,prompt="openflow@ETH-Tutorial:~\$")
+            result = self.execute(cmd="sudo mn -c",timeout=30,prompt="password")
+            pattern = '[sudo]'
+            if utilities.assert_matches(expect=pattern,actual=result,onpass="password is being asked",onfail="password is not being asked"):
+                resultPass = self.execute(cmd="openflow",prompt="openflow",timeout=120)
 
-            main.log.info("Password providing for running at sudo mode")
-            result2 = self.execute(cmd="openflow",timeout=10,prompt="openflow@ETH-Tutorial:~\$")
-            #preparing command to launch mininet
-            main.log.info("Launching network using mininet")   
+            else :
+                main.log.info("password is not being asked")
+                pass
+
             cmdString = "sudo mn --topo "+self.options['topo']+","+self.options['topocount']+" --mac --switch "+self.options['switch']+" --controller "+self.options['controller']
-            result4 = self.execute(cmd=cmdString,timeout=10,prompt="mininet>|[p|P]assword")
-            pattern = '[p|P]assword'
-            result3 = ''
-            
-            if utilities.assert_matches(expect=pattern,actual=result4,onpass="Asking for password",onfail="not asking for Password"):
-                result3 = self.execute(cmd="openflow",timeout=10,prompt="mininet>")
+            resultCommand = self.execute(cmd=cmdString,prompt='mininet',timeout=120)
+
+            patterns = "Starting CLI:"
+            if utilities.assert_matches(expect=patterns,actual=resultCommand,onpass="Network is being launched",onfail="Network launching is being failed "):
+                return main.TRUE
             else:
-                result3 = result4
-            main.log.info("Network is being launched")
-            return main.TRUE
+                return main.FALSE
 
         else :
             main.log.error("Connection failed to the host "+self.user_name+"@"+self.ip_address) 
