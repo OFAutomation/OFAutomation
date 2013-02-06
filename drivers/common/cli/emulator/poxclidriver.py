@@ -49,7 +49,7 @@ class PoxCliDriver(Emulator):
             if self.options['pox_lib_location'] != 'default':
                 self.execute(cmd="cd "+self.options['pox_lib_location'],prompt="/pox\$",timeout=120)
             else:    
-                self.execute(cmd="cd ~/OFAutomation-OFAutomation-0.0.1/lib/pox/",prompt="/pox\$",timeout=120)
+                self.execute(cmd="cd ~/OFAutomation/lib/pox/",prompt="/pox\$",timeout=120)
             ### launching pox with components    
             main.log.info("launching POX controller with given components")
             self.execute(cmd=command,prompt="DEBUG:",timeout=120)
@@ -97,6 +97,11 @@ class PoxCliDriver(Emulator):
             else:
                 if item == 'pox_lib_location':
                     poxLibPath = options[item]
+                elif item == 'type' or item == 'name':
+                    pass
+                else :
+                    command = command + item
+
 
         return command 
             
