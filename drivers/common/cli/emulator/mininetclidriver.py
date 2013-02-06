@@ -60,10 +60,12 @@ class MininetCliDriver(Emulator):
             else:
                 result3 = result4
             main.log.info("Network is being launched")
+            return main.TRUE
 
         else :
-            main.log.error("Connection failed to the host"+self.user_name+"@"+self.ip_address) 
+            main.log.error("Connection failed to the host "+self.user_name+"@"+self.ip_address) 
             main.log.error("Failed to connect to the Mininet")
+            return main.FALSE
                        
     def pingall(self):
         '''

@@ -53,9 +53,11 @@ class PoxCliDriver(Emulator):
             ### launching pox with components    
             main.log.info("launching POX controller with given components")
             self.execute(cmd=command,prompt="DEBUG:",timeout=120)
+            return main.TRUE
         else :
-            main.log.error("Connection failed to the host"+self.user_name+"@"+self.ip_address)
+            main.log.error("Connection failed to the host "+self.user_name+"@"+self.ip_address)
             main.log.error("Failed to connect to the POX controller")
+            return main.FALSE
     
         
     def disconnect(self,handle):

@@ -55,7 +55,7 @@ class CLI(Component):
             main.log.error("No route to the Host "+self.user_name+"@"+self.ip_address)
             return main.FALSE
         elif i==4:
-            main.log.error("ssh: connect to host "+ip_address+" port 22: Connection refused")
+            main.log.error("ssh: connect to host "+self.ip_address+" port 22: Connection refused")
             return main.FALSE
 
         self.handle.sendline("\r")        
