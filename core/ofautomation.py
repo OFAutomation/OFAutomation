@@ -161,6 +161,13 @@ class OFAutomation:
         self.TOTAL_TC_PASS = 0
         self.stepCount = 0
         self.CASERESULT = self.TRUE
+        
+        import testparser
+        testFile = self.tests_path + "/"+self.TEST + "/"+self.TEST + ".py"
+        test = testparser.TestParser(testFile)
+        self.testscript = test.testscript
+        self.code = test.getStepCode()
+        
         result = self.TRUE
         for self.CurrentTestCaseNumber in self.testcases_list:
             result = self.runCase(self.CurrentTestCaseNumber)
@@ -169,43 +176,45 @@ class OFAutomation:
     def runCase(self,testCaseNumber):
         self.CurrentTestCaseNumber = testCaseNumber
         result = self.TRUE
-        self.stepCount = 1
+        self.stepCount = 0
         self.EXPERIMENTAL_MODE = self.FALSE
         self.addCaseHeader()
-        
-        import testparser
-        testCaseNumber = str(testCaseNumber)
-        testFile = self.tests_path + "/"+self.TEST + "/"+self.TEST + ".py"
-        test = testparser.TestParser(testFile)
-        main.testscript = test.testscript
-        code = test.getStepCode()
-        stepCount = 0
+        self.testCaseNumber = str(testCaseNumber)
         stopped = False
-        stepList = code[testCaseNumber].keys()
+        self.stepList = self.code[self.testCaseNumber].keys()
         self.stepCount = 0
-        while self.stepCount < len(code[testCaseNumber].keys()):
-            if not cli.pause:
-                try :
-                    step = stepList[self.stepCount]
-                    exec code[testCaseNumber][step] in module.__dict__
-                    self.stepCount = self.stepCount + 1
-                except TypeError,e:
-                    self.stepCount = self.stepCount + 1
-                    self.log.error(e)
-            if cli.stop:
-                cli.stop = False
-                stopped = True
-                self.TOTAL_TC_NORESULT = self.TOTAL_TC_NORESULT + 1
-                self.testCaseResult[str(self.CurrentTestCaseNumber)] = "Stopped"
-                self.logger.updateCaseResults(self)
-                result = self.cleanup()
-                break    
-        
+        while self.stepCount < len(self.code[self.testCaseNumber].keys()):
+            result = self.runStep(self.stepList,self.code,self.testCaseNumber)
+            if result == main.FALSE:
+                break
+            elif result == main.TRUE :
+                continue
+            
         if not stopped :
             self.testCaseResult[str(self.CurrentTestCaseNumber)] = self.CASERESULT
             self.logger.updateCaseResults(self)
         return result
     
+    def runStep(self,stepList,code,testCaseNumber):
+        if not cli.pause:
+            try :
+                step = stepList[self.stepCount]
+                exec code[testCaseNumber][step] in module.__dict__
+                self.stepCount = self.stepCount + 1
+            except TypeError,e:
+                self.stepCount = self.stepCount + 1
+                self.log.error(e)
+            return main.TRUE
+        
+        if cli.stop:
+            cli.stop = False
+            stopped = True
+            self.TOTAL_TC_NORESULT = self.TOTAL_TC_NORESULT + 1
+            self.testCaseResult[str(self.CurrentTestCaseNumber)] = "Stopped"
+            self.logger.updateCaseResults(self)
+            result = self.cleanup()
+            return main.FALSE
+        
     def addCaseHeader(self):
         caseHeader = "\n"+"*" * 30+"\n Result summary for Testcase"+str(self.CurrentTestCaseNumber)+"\n"+"*" * 30+"\n"
         self.log.exact(caseHeader) 

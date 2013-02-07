@@ -115,7 +115,9 @@ class CLI( threading.Thread,Cmd,object ):
         
         '''
         if testthread:
+            main.log.info("Executing the nextstep, Will pause test execution, after completion of the step")
             testthread.play()
+            time.sleep(.1)
             testthread.pause()
         else:
             print "There is no paused test "
@@ -549,7 +551,8 @@ class TestThread(threading.Thread):
         print "Stopping the test"
         self.is_stop = True
         cli.stop = True
-         
+        __builtin__.testthread = False
+        
 def output(msg):
     '''
     Simply, print the message in console
