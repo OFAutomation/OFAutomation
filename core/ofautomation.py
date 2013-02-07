@@ -181,7 +181,12 @@ class OFAutomation:
         self.addCaseHeader()
         self.testCaseNumber = str(testCaseNumber)
         stopped = False
-        self.stepList = self.code[self.testCaseNumber].keys()
+        try :
+            self.stepList = self.code[self.testCaseNumber].keys()
+        except KeyError,e:
+            main.log.error("There is no Test-Case "+ self.testCaseNumber)
+            return main.FALSE
+        
         self.stepCount = 0
         while self.stepCount < len(self.code[self.testCaseNumber].keys()):
             result = self.runStep(self.stepList,self.code,self.testCaseNumber)
@@ -432,9 +437,17 @@ def verifyTestCases(options):
         testcases_list = re.sub("(\[|\])", "", options.testcases)
         main.testcases_list = eval(testcases_list+",")
     else :
-        main.params['testcases'] = re.sub("(\[|\])", "", main.params['testcases'])
-        main.testcases_list = eval(main.params['testcases']+",") 
-        
+        if 'testcases' in main.params.keys():
+            main.params['testcases'] = re.sub("(\[|\])", "", main.params['testcases'])
+            if re.search('\d+', main.params['testcases'], 0):
+                main.testcases_list = eval(main.params['testcases']+",")
+            else :
+                print "Please provide the testcases list in Params file"
+                sys.exit()
+        else :
+            print "testcases not specifed in params, please provide in params file or 'testcases' commandline argument"
+            sys.exit() 
+                  
 def verifyTestScript(options):
     '''
     Verifyies test script.
