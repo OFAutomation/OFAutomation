@@ -398,14 +398,6 @@ class CLI( threading.Thread,Cmd,object ):
         "Is our standard input a tty?"
         return isatty( self.stdin.fileno() )
 
-    def do_noecho( self, line ):
-        "Run an interactive command with echoing turned off."
-        if self.isatty():
-            quietRun( 'stty -echo' )
-        self.default( line )
-        if self.isatty():
-            quietRun( 'stty echo' )
-
     def do_source( self, line ):
         '''
         Read shell commands from an input file and execute them sequentially.

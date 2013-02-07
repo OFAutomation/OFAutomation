@@ -101,11 +101,13 @@ class UpdateDriver:
           module -> methodList .It will return the same Hash.
         '''
         classList = []
-        #try :
-        moduleList = self.configDict['config-driver']['importTypes'][self.driver]['modules'].keys()
-        #except KeyError:
-        #    print "Error : Module Does not Exists"    
-            
+        try :
+            moduleList = self.configDict['config-driver']['importTypes'][self.driver]['modules'].keys()
+        except KeyError,e:
+            print "Error : Module Does not Exists"    
+            print e
+            return False
+     
         for index,value in enumerate(moduleList):
             modulePath = self.configDict['config-driver']['importTypes'][self.driver]['modules'][value]['path']
             moduleName = self.configDict['config-driver']['importTypes'][self.driver]['modules'][value]['name']
@@ -293,23 +295,30 @@ class UpdateDriver:
         if len(drivers) == 0:
             for index, driverName in enumerate(self.configDict['config-driver']['importTypes'].keys()):
                 self.driver = driverName
-                self.getList()
-                self.getDriverPath()
-                self.appendDriver(self.driverPath + self.driver + ".py")
-                self.driverList.append(self.driverPath + self.driver + ".py")
+                result = self.getList()
+                if result : 
+                    self.getDriverPath()
+                    self.appendDriver(self.driverPath + self.driver + ".py")
+                    self.driverList.append(self.driverPath + self.driver + ".py")
+                else :
+                    return False 
         else :
             for index, driverName in enumerate(drivers) :
                 
                 self.driver = driverName
-                self.getList()
-                self.getDriverPath()
-                self.appendDriver(self.driverPath + self.driver + ".py")
-                self.driverList.append(self.driverPath + self.driver + ".py")
+                result = self.getList()
+                if result :
+                    self.getDriverPath()
+                    self.appendDriver(self.driverPath + self.driver + ".py")
+                    self.driverList.append(self.driverPath + self.driver + ".py")
+                else :
+                    return False 
          
         print "=" * 90
         print " " * 30  + "Output Driver File :"
         print ",\n".join(self.driverList)         
         print "=" * 90
+        return True   
        
 
  
