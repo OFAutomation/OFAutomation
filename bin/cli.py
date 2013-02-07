@@ -265,6 +265,7 @@ class CLI( threading.Thread,Cmd,object ):
         '''
         if re.match("testcases",option,1):
             testcases = []
+            args[index] = re.sub("\[|\]","",args[index],0)
             m = re.match("(\d+)\-(\d+)",args[index],flags=0)
             if m:
                 start_case = eval(m.group(1))
@@ -276,6 +277,9 @@ class CLI( threading.Thread,Cmd,object ):
                         i= i+1         
                 else :
                     print "Please specify testcases properly like 1-5"
+            else :
+                options[option] = args[index]
+                return options
             options[option] = str(testcases)
             
         return options
