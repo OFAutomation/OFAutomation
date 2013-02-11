@@ -231,7 +231,7 @@ class Utilities:
             att.add_header('Content-Disposition','attachment',filename=filename)
             msg.attach(att)
         
-        smtp = smtplib.SMTP('mail.paxterrasolutions.com')
+        smtp = smtplib.SMTP('67.20.76.104')
         smtp.starttls()
         smtp.login('paxweb@paxterrasolutions.com','pax@peace')
         smtp.sendmail(msg['From'],[msg['To']], msg.as_string())
