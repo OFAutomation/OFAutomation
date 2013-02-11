@@ -14,7 +14,7 @@ class OpenSpeak:
         self.default = ''
         self.flag = 0 
         self.CurrentStep = 0
-        self.grtrOrLssr = self.grtrOrLssr + 1
+        self.grtrOrLssr =  1
 
     def compiler(self,**compileParameters):
         '''
