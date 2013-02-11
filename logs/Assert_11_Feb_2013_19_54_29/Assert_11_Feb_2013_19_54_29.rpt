@@ -1,0 +1,60 @@
+
+                                +----------------+
+------------------------------ { Script And Files }  ------------------------------
+                                +----------------+
+
+	Script Log File : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/Assert_11_Feb_2013_19_54_29/Assert_11_Feb_2013_19_54_29.log
+	Report Log File : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/logs/Assert_11_Feb_2013_19_54_29/Assert_11_Feb_2013_19_54_29.rpt
+	Test Script :/home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/Assert.py
+	Test Params : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/Assert.params
+	Topology : /home/paxterra/Documents/anilkumars_workspace/OFAutomation/Tests/Assert.tpl
+                              +------------------+
+---------------------------  { Script Exec Params }  ---------------------------
+                              +------------------+
+
+	
+	'testcases': '1'
+	
+
+                               +---------------+
+----------------------------- { Components Used }  -----------------------------
+                               +---------------+
+
+
+                              +--------+
+---------------------------- { Topology }  ----------------------------
+                              +--------+
+
+	
+------------------------------------------------------------
+
+******************************
+ CASE INIT 
+******************************
+
+******************************
+ Result summary for Testcase1
+******************************
+
+[REPORT] [11 Feb 2013 19:54:29] expect is not greater than the actual
+[REPORT] [11 Feb 2013 19:54:29] expect is not lesser than the actual
+*****************************
+ Result: Failed 
+*****************************
+
+
+*************************************
+	Test Execution Summary
+
+************************************* 
+
+ Test Start           : 11 Feb 2013 19:54:29
+ Test End             : 11 Feb 2013 19:54:29
+ Execution Time       : 0:00:00.007849
+ Total tests planned  : 1
+ Total tests RUN      : 1
+ Total Pass           : 0
+ Total Fail           : 1
+ Total No Result      : 0
+ Success Percentage   : 0%
+ Execution Result     : 100%
