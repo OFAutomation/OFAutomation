@@ -13,6 +13,8 @@ class OpenSpeak:
     def __init__(self):
         self.default = ''
         self.flag = 0 
+        self.CurrentStep = 0
+        self.grtrOrLssr = self.grtrOrLssr + 1
 
     def compiler(self,**compileParameters):
         '''
@@ -361,19 +363,34 @@ class OpenSpeak:
             print "\n Error : Operator has not been specified !!!"
         elif notOperatorMatch or notOperatorSymbMatch:
             
-            operators = notOperatorMatch.group(1) if notOperatorMatch else notOperatorSymbMatch.group(1) 
+            operators = notOperatorMatch.group(1) if notOperatorMatch else notOperatorSymbMatch.group(1)
             operators = self.translate_operator(operator=operators)
-            resultString = resultString + "utilities.assert_not_" + operators + "(expect=" +\
-                           self.translate_response_result(operator=args["RIGHTVALUE"]) + ",actual=" + self.translate_response_result(operator=args["LEFTVALUE"]) +\
-                           ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
-                           ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")" 
+            if self.grtrOrLssr == 0 :
+                resultString = resultString + "utilities.assert_not_" + operators + "(expect=" +\
+                               self.translate_response_result(operator=args["RIGHTVALUE"]) + ",actual=" + self.translate_response_result(operator=args["LEFTVALUE"]) +\
+                               ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
+                               ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")"
+            else :
+                resultString = resultString + "utilities.assert_not_" + operators + "(expect=" +\
+                               self.translate_response_result(operator=args["LEFTVALUE"]) + ",actual=" + self.translate_response_result(operator=args["RIGHTVALUE"]) +\
+                               ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
+                               ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")"
+
         else :           
             operators = self.translate_operator(operator=args["OPERATOR"])
-            resultString = resultString + "utilities.assert_" + operators + "(expect=" +\
-                           self.translate_response_result(operator=args["RIGHTVALUE"]) +\
-                           ",actual=" + self.translate_response_result(operator=args["LEFTVALUE"]) +\
-                           ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
-                           ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")" 
+            if self.grtrOrLssr == 0 :
+                resultString = resultString + "utilities.assert_" + operators + "(expect=" +\
+                               self.translate_response_result(operator=args["RIGHTVALUE"]) +\
+                               ",actual=" + self.translate_response_result(operator=args["LEFTVALUE"]) +\
+                               ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
+                               ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")"
+            else :
+                resultString = resultString + "utilities.assert_" + operators + "(expect=" +\
+                               self.translate_response_result(operator=args["LEFTVALUE"]) +\
+                               ",actual=" + self.translate_response_result(operator=args["RIGHTVALUE"]) +\
+                               ",onpass=" + self.translate_assertMessage(message=args["ONPASS"]) +\
+                               ",onfail=" + self.translate_assertMessage(message=args["ONFAIL"]) + ")"
+ 
             
         return resultString
 
@@ -448,10 +465,10 @@ class OpenSpeak:
             
             resultString = resultString + "equals"
         elif greaterMatch : 
-            
+            self.grtrOrLssr = self.grtrOrLssr + 1
             resultString = resultString + "greater"
         elif lesserMatch : 
-            
+            self.grtrOrLssr = self.grtrOrLssr + 1
             resultString = resultString + "lesser"
         elif stringMatch :
             
