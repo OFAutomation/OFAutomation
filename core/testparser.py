@@ -22,7 +22,7 @@ class TestParser:
         index = 0 
         self.statementsList = []
         while index < len(testFileList):
-            testFileList[index] = re.sub("^\s*", "", testFileList[index])
+            testFileList[index] = re.sub("^\s\s\s\s\s\s\s\s|^\s\s\s\s", "", testFileList[index])
             # Skip multiline comments 
             if re.match('^(\'\'\')|^(\"\"\")',testFileList[index],0) :
                 index = index + 1
