@@ -14,7 +14,7 @@ Utilities will take care about the basic functions like :
 import re
 from configobj import ConfigObj
 import pydoc
-import ast
+from core import ast as ast
 import smtplib
 
 import mimetypes
